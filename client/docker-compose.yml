@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  mongo:
+    image: mongo:latest
+    container_name: mongo-db
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - ./databases/mongo:/data/db
+
+  backend:
+    # BUILD PATH: Agar folder ka naam 'server' hai to:
+    build: ./Globes_Properties/server
+    container_name: globes-backend
+    ports:
+      - "5000:5000"
+    depends_on:
+      - mongo
+    env_file:
+      - ./Globes_Properties/server/.env
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/globes_db
+      - NODE_ENV=production
+
+  frontend:
+    # BUILD PATH: Agar folder ka naam 'client' hai to:
+    build: ./Globes_Properties/client
+    container_name: globes-frontend
+    ports:
+      - "5173:3000"
+    depends_on:
+      - backend
