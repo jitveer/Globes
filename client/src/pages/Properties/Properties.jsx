@@ -43,9 +43,8 @@ const ProgressiveImage = ({ src, thumbnailSrc, alt, className }) => {
           src={src}
           alt={alt}
           onLoad={() => setIsFullLoaded(true)}
-          className={`${className} absolute inset-0 transition-opacity duration-700 ease-in-out ${
-            isFullLoaded ? "opacity-100" : "opacity-0"
-          }`}
+          className={`${className} absolute inset-0 transition-opacity duration-700 ease-in-out ${isFullLoaded ? "opacity-100" : "opacity-0"
+            }`}
         />
       )}
 
@@ -54,13 +53,11 @@ const ProgressiveImage = ({ src, thumbnailSrc, alt, className }) => {
         src={hasThumbnail ? thumbnailSrc : src}
         alt={alt}
         loading="lazy"
-        className={`${className} ${
-          hasThumbnail
-            ? `transition-opacity duration-700 ease-in-out ${
-                isFullLoaded ? "opacity-0" : "opacity-100"
-              }`
+        className={`${className} ${hasThumbnail
+            ? `transition-opacity duration-700 ease-in-out ${isFullLoaded ? "opacity-0" : "opacity-100"
+            }`
             : ""
-        }`}
+          }`}
       />
     </div>
   );
@@ -128,10 +125,10 @@ const Properties = () => {
     const placeholder = "https://via.placeholder.com/800x600?text=No+Image";
     if (!imageField) return { webp: placeholder, thumbnail: null };
 
-    // New format: { webp, thumbnail, original }
+    // New format: { webp, thumbnail, original, url }
     if (typeof imageField === "object" && !Array.isArray(imageField)) {
       return {
-        webp: buildUrl(imageField.webp) || placeholder,
+        webp: buildUrl(imageField.webp || imageField.url) || placeholder,
         thumbnail: buildUrl(imageField.thumbnail) || null,
       };
     }
@@ -377,10 +374,10 @@ const Properties = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50/20 to-gray-50 md:mt-20">
-      <SEO 
-        title="Properties List" 
-        description="Browse through our wide range of properties in Bangalore. Find apartments, houses, commercial spaces, and land." 
-        keywords="properties in Bangalore, buy property, real estate listings" 
+      <SEO
+        title="Properties List"
+        description="Browse through our wide range of properties in Bangalore. Find apartments, houses, commercial spaces, and land."
+        keywords="properties in Bangalore, buy property, real estate listings"
       />
       {/* Hero Section */}
       {/* <section className="relative bg-gradient-to-r from-orange-600 to-orange-700 pt-24 md:pt-32 pb-16 overflow-hidden"> */}
@@ -546,15 +543,11 @@ const Properties = () => {
                           }
                           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                           style={{
-                            background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${
-                              (filters.minPrice / 30000) * 100
-                            }%, #ea580c ${
-                              (filters.minPrice / 30000) * 100
-                            }%, #ea580c ${
-                              (filters.maxPrice / 30000) * 100
-                            }%, #e5e7eb ${
-                              (filters.maxPrice / 30000) * 100
-                            }%, #e5e7eb 100%)`,
+                            background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${(filters.minPrice / 30000) * 100
+                              }%, #ea580c ${(filters.minPrice / 30000) * 100
+                              }%, #ea580c ${(filters.maxPrice / 30000) * 100
+                              }%, #e5e7eb ${(filters.maxPrice / 30000) * 100
+                              }%, #e5e7eb 100%)`,
                           }}
                         />
                       </div>
@@ -613,15 +606,11 @@ const Properties = () => {
                           }
                           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                           style={{
-                            background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${
-                              (filters.minArea / 10000) * 100
-                            }%, #ea580c ${
-                              (filters.minArea / 10000) * 100
-                            }%, #ea580c ${
-                              (filters.maxArea / 10000) * 100
-                            }%, #e5e7eb ${
-                              (filters.maxArea / 10000) * 100
-                            }%, #e5e7eb 100%)`,
+                            background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${(filters.minArea / 10000) * 100
+                              }%, #ea580c ${(filters.minArea / 10000) * 100
+                              }%, #ea580c ${(filters.maxArea / 10000) * 100
+                              }%, #e5e7eb ${(filters.maxArea / 10000) * 100
+                              }%, #e5e7eb 100%)`,
                           }}
                         />
                       </div>
@@ -721,14 +710,12 @@ const Properties = () => {
             <div className="flex-1 pb-20 md:pb-0">
               {/* Results Header */}
               <div
-                className={`sticky top-20 md:top-20 z-30 md:static transition-all duration-300 ${
-                  isHeaderScrolled ? "" : "bg-transparent py-0"
-                } -mx-4 px-4 mb-6 flex items-center justify-between animate-[fadeInUp_0.5s_ease-out]`}
+                className={`sticky top-20 md:top-20 z-30 md:static transition-all duration-300 ${isHeaderScrolled ? "" : "bg-transparent py-0"
+                  } -mx-4 px-4 mb-6 flex items-center justify-between animate-[fadeInUp_0.5s_ease-out]`}
               >
                 <h2
-                  className={`text-xl md:text-2xl font-black text-gray-900 transition-all duration-300 ${
-                    isHeaderScrolled ? "opacity-0" : "opacity-100"
-                  } md:opacity-100 md:visible md:w-auto md:translate-x-0`}
+                  className={`text-xl md:text-2xl font-black text-gray-900 transition-all duration-300 ${isHeaderScrolled ? "opacity-0" : "opacity-100"
+                    } md:opacity-100 md:visible md:w-auto md:translate-x-0`}
                 >
                   {filteredProperties.length} Properties
                 </h2>
@@ -737,22 +724,20 @@ const Properties = () => {
                 <div className="flex items-center gap-2 bg-white rounded-xl p-1 shadow-md border border-gray-200 ">
                   <button
                     onClick={() => setViewMode("grid")}
-                    className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold transition-all duration-300 text-sm md:text-base ${
-                      viewMode === "grid"
+                    className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold transition-all duration-300 text-sm md:text-base ${viewMode === "grid"
                         ? "bg-orange-600 text-white shadow-md"
                         : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <FaThLarge />
                     <span className="hidden sm:inline">Grid</span>
                   </button>
                   <button
                     onClick={() => setViewMode("list")}
-                    className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold transition-all duration-300 text-sm md:text-base ${
-                      viewMode === "list"
+                    className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold transition-all duration-300 text-sm md:text-base ${viewMode === "list"
                         ? "bg-orange-600 text-white shadow-md"
                         : "text-gray-600 hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <FaList />
                     <span className="hidden sm:inline">List</span>
@@ -803,34 +788,30 @@ const Properties = () => {
               {/* Properties Grid/List */}
               {!loading && filteredProperties.length > 0 && (
                 <div
-                  className={`grid gap-6 ${
-                    viewMode === "grid"
+                  className={`grid gap-6 ${viewMode === "grid"
                       ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
                       : "grid-cols-1"
-                  }`}
+                    }`}
                 >
                   {filteredProperties.map((property, index) => (
                     <article
                       key={property.id}
                       onClick={() => navigate(`/property/${property.id}`)}
-                      className={`group bg-white rounded-b-3xl rounded-t-xl shadow-[0_10px_30px_rgba(0,0,0,0.03)] border border-gray-50 transition-all duration-500 overflow-hidden animate-[fadeInUp_${
-                        0.3 + index * 0.05
-                      }s_ease-out] cursor-pointer active:scale-[0.98] ${
-                        viewMode === "grid"
+                      className={`group bg-white rounded-b-3xl rounded-t-xl shadow-[0_10px_30px_rgba(0,0,0,0.03)] border border-gray-50 transition-all duration-500 overflow-hidden animate-[fadeInUp_${0.3 + index * 0.05
+                        }s_ease-out] cursor-pointer active:scale-[0.98] ${viewMode === "grid"
                           ? "md:hover:scale-[1.000] md:hover:-translate-y-1"
                           : "md:hover:scale-[1.003]"
-                      }`}
+                        }`}
                     >
                       <div
                         className={viewMode === "list" ? "flex flex-row" : ""}
                       >
                         {/* Image */}
                         <div
-                          className={`relative overflow-hidden ${
-                            viewMode === "grid"
+                          className={`relative overflow-hidden ${viewMode === "grid"
                               ? "h-64"
                               : "w-[120px] md:w-80 h-auto md:h-full"
-                          }`}
+                            }`}
                         >
                           <ProgressiveImage
                             src={property.imageWebp}
@@ -844,22 +825,20 @@ const Properties = () => {
                           <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
                             {property.featured && (
                               <div
-                                className={`bg-orange-600 text-white px-2 py-0.5 rounded-full font-black shadow-md ${
-                                  viewMode === "list"
+                                className={`bg-orange-600 text-white px-2 py-0.5 rounded-full font-black shadow-md ${viewMode === "list"
                                     ? "text-[8px]"
                                     : "text-[10px]"
-                                }`}
+                                  }`}
                               >
                                 Featured
                               </div>
                             )}
                             {property.isNewLaunch && (
                               <div
-                                className={`bg-emerald-500 text-white px-2 py-0.5 rounded-full font-black shadow-md flex items-center gap-1 ${
-                                  viewMode === "list"
+                                className={`bg-emerald-500 text-white px-2 py-0.5 rounded-full font-black shadow-md flex items-center gap-1 ${viewMode === "list"
                                     ? "text-[8px]"
                                     : "text-[10px]"
-                                }`}
+                                  }`}
                               >
                                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
                                 New Launch
@@ -873,26 +852,23 @@ const Properties = () => {
                               e.stopPropagation();
                               toggleFavorite(property.id);
                             }}
-                            className={`absolute top-3 right-3 bg-white/90 backdrop-blur-md rounded-xl flex items-center justify-center shadow-md md:hover:scale-110 active:scale-75 transition-all duration-300 z-10 ${
-                              viewMode === "list" ? "w-6 h-6" : "w-8 h-8"
-                            }`}
+                            className={`absolute top-3 right-3 bg-white/90 backdrop-blur-md rounded-xl flex items-center justify-center shadow-md md:hover:scale-110 active:scale-75 transition-all duration-300 z-10 ${viewMode === "list" ? "w-6 h-6" : "w-8 h-8"
+                              }`}
                           >
                             <FaHeart
-                              className={`transition-colors duration-300 ${
-                                favorites.includes(property.id)
+                              className={`transition-colors duration-300 ${favorites.includes(property.id)
                                   ? "text-red-500"
                                   : "text-gray-300"
-                              } ${viewMode === "list" ? "text-[10px]" : "text-xs"}`}
+                                } ${viewMode === "list" ? "text-[10px]" : "text-xs"}`}
                             />
                           </button>
 
                           {/* Type Badge */}
                           <div
-                            className={`absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1.5 shadow-sm z-10 ${
-                              viewMode === "list"
+                            className={`absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1.5 shadow-sm z-10 ${viewMode === "list"
                                 ? "scale-90 origin-bottom-left"
                                 : ""
-                            }`}
+                              }`}
                           >
                             <FaHome className="text-orange-600 text-[10px]" />
                             <span className="text-[10px] font-black text-gray-700">
@@ -908,20 +884,18 @@ const Properties = () => {
 
                         {/* Content */}
                         <div
-                          className={`${
-                            viewMode === "list"
+                          className={`${viewMode === "list"
                               ? "flex-1 p-2.5 flex flex-col justify-between"
                               : "p-3 md:px-1 md:py-1"
-                          }`}
+                            }`}
                         >
                           <div>
                             {/* Title */}
                             <h3
-                              className={`font-black text-gray-900 mb-1 group-hover:text-[#1B0F05] transition-colors duration-300 ${
-                                viewMode === "grid"
+                              className={`font-black text-gray-900 mb-1 group-hover:text-[#1B0F05] transition-colors duration-300 ${viewMode === "grid"
                                   ? "text-lg line-clamp-2"
                                   : "text-sm md:text-xl line-clamp-2"
-                              }`}
+                                }`}
                             >
                               {property.title}
                             </h3>
@@ -930,11 +904,10 @@ const Properties = () => {
                             <div className="flex items-center gap-1.5 text-gray-500 mb-2">
                               <FaMapMarkerAlt className="text-orange-600 flex-shrink-0 text-[10px] md:text-sm" />
                               <span
-                                className={`font-bold line-clamp-1 ${
-                                  viewMode === "list"
+                                className={`font-bold line-clamp-1 ${viewMode === "list"
                                     ? "text-[10px] md:text-sm"
                                     : "text-sm"
-                                }`}
+                                  }`}
                               >
                                 {typeof property.location === "object"
                                   ? `${property.location.area}, ${property.location.city}`
@@ -970,34 +943,30 @@ const Properties = () => {
 
                           {/* Price & Button */}
                           <div
-                            className={`flex items-center justify-between pt-3 border-t border-gray-100 ${
-                              viewMode === "list" ? "mt-0" : "pt-1"
-                            }`}
+                            className={`flex items-center justify-between pt-3 border-t border-gray-100 ${viewMode === "list" ? "mt-0" : "pt-1"
+                              }`}
                           >
                             <div>
                               <p
-                                className={`text-gray-500 mb-1 ${
-                                  viewMode === "list"
+                                className={`text-gray-500 mb-1 ${viewMode === "list"
                                     ? "text-xxs sm:text-xs"
                                     : "text-xs"
-                                }`}
+                                  }`}
                               >
                                 Starting from
                               </p>
                               <p
-                                className={`font-black text-gray-900 ${
-                                  viewMode === "list"
+                                className={`font-black text-gray-900 ${viewMode === "list"
                                     ? "text-base md:text-2xl"
                                     : "text-2xl"
-                                }`}
+                                  }`}
                               >
                                 ₹{property.price}
                                 <span
-                                  className={`font-bold text-gray-500 ${
-                                    viewMode === "list"
+                                  className={`font-bold text-gray-500 ${viewMode === "list"
                                       ? "text-[10px]"
                                       : "text-lg"
-                                  }`}
+                                    }`}
                                 >
                                   K
                                 </span>
@@ -1008,11 +977,10 @@ const Properties = () => {
                                 e.stopPropagation();
                                 navigate(`/property/${property.id}`);
                               }}
-                              className={`bg-[#1B0F05] text-white rounded-xl font-black md:hover:bg-orange-600 transition-all duration-300 md:hover:scale-105 active:scale-90 shadow-lg ${
-                                viewMode === "list"
+                              className={`bg-[#1B0F05] text-white rounded-xl font-black md:hover:bg-orange-600 transition-all duration-300 md:hover:scale-105 active:scale-90 shadow-lg ${viewMode === "list"
                                   ? "px-3 py-1.5 text-[10px] md:text-base"
                                   : "px-6 py-3 text-sm"
-                              }`}
+                                }`}
                             >
                               Details
                             </button>
@@ -1143,15 +1111,11 @@ const Properties = () => {
                       }
                       className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                       style={{
-                        background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${
-                          (filters.minPrice / 30000) * 100
-                        }%, #ea580c ${
-                          (filters.minPrice / 30000) * 100
-                        }%, #ea580c ${
-                          (filters.maxPrice / 30000) * 100
-                        }%, #e5e7eb ${
-                          (filters.maxPrice / 30000) * 100
-                        }%, #e5e7eb 100%)`,
+                        background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${(filters.minPrice / 30000) * 100
+                          }%, #ea580c ${(filters.minPrice / 30000) * 100
+                          }%, #ea580c ${(filters.maxPrice / 30000) * 100
+                          }%, #e5e7eb ${(filters.maxPrice / 30000) * 100
+                          }%, #e5e7eb 100%)`,
                       }}
                     />
                   </div>
@@ -1210,15 +1174,11 @@ const Properties = () => {
                       }
                       className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                       style={{
-                        background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${
-                          (filters.minArea / 10000) * 100
-                        }%, #ea580c ${
-                          (filters.minArea / 10000) * 100
-                        }%, #ea580c ${
-                          (filters.maxArea / 10000) * 100
-                        }%, #e5e7eb ${
-                          (filters.maxArea / 10000) * 100
-                        }%, #e5e7eb 100%)`,
+                        background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${(filters.minArea / 10000) * 100
+                          }%, #ea580c ${(filters.minArea / 10000) * 100
+                          }%, #ea580c ${(filters.maxArea / 10000) * 100
+                          }%, #e5e7eb ${(filters.maxArea / 10000) * 100
+                          }%, #e5e7eb 100%)`,
                       }}
                     />
                   </div>

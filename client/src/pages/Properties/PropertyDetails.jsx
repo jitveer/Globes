@@ -127,7 +127,9 @@ const PropertyDetails = () => {
     if (!imageInput) return placeholder;
 
     // Support both old string format and new optimized object format
-    const url = typeof imageInput === "string" ? imageInput : imageInput.webp;
+    const url = typeof imageInput === "string"
+      ? imageInput
+      : (imageInput.url || imageInput.webp || imageInput.original);
 
     if (!url) return placeholder;
     if (url.startsWith("http")) return url;
@@ -184,11 +186,19 @@ const PropertyDetails = () => {
             area: "",
           };
 
-          // Format image URLs
-          prop.images = prop.images.map((img) => getImageUrl(img));
-          if (prop.images.length === 0) {
-            prop.images = ["https://via.placeholder.com/800x600?text=No+Image"];
-          }
+          // Normalize images format to objects { url, alt } with absolute URLs
+          prop.images = prop.images && prop.images.length > 0
+            ? prop.images.map((img) => {
+              if (typeof img === "string") return { url: getImageUrl(img), alt: "" };
+              return {
+                url: getImageUrl(img.url || img.webp || img.original || ""),
+                alt: img.alt || "",
+                webp: img.webp ? getImageUrl(img.webp) : "",
+                thumbnail: img.thumbnail ? getImageUrl(img.thumbnail) : "",
+                original: img.original ? getImageUrl(img.original) : ""
+              };
+            })
+            : [{ url: "https://via.placeholder.com/800x600?text=No+Image", alt: "" }];
 
           // Map icons from iconName strings to components
           prop.features = prop.features.map((f) => ({
@@ -392,10 +402,12 @@ const PropertyDetails = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50/20 to-gray-50 pt-4 md:pt-24 pb-12">
-      <SEO 
-        title={property.title} 
-        description={property.description ? property.description.substring(0, 150) : "View details of this amazing property on Globes Properties."} 
-        image={property.images && property.images.length > 0 ? property.images[0] : undefined}
+      <SEO
+        title={property.seoTitle || property.title}
+        description={property.seoDescription || (property.description ? property.description.substring(0, 150) : "View details of this amazing property on Globes Properties.")}
+        keywords={property.seoKeywords || ""}
+        image={property.images && property.images.length > 0 ? property.images[0].url : undefined}
+        imageAlt={(property.images && property.images.length > 0 ? property.images[0].alt : "") || property.featuredImageAlt || property.title}
       />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Back Button */}
@@ -481,20 +493,18 @@ const PropertyDetails = () => {
             className="relative h-[300px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl group cursor-grab active:cursor-grabbing"
           >
             <div
-              className={`flex h-full w-full ${
-                !isDragging ? "transition-transform duration-500 ease-out" : ""
-              }`}
+              className={`flex h-full w-full ${!isDragging ? "transition-transform duration-500 ease-out" : ""
+                }`}
               style={{
-                transform: `translateX(calc(-${
-                  currentImageIndex * 100
-                }% + ${dragOffset}px))`,
+                transform: `translateX(calc(-${currentImageIndex * 100
+                  }% + ${dragOffset}px))`,
               }}
             >
               {property.images.map((image, index) => (
                 <img
                   key={index}
-                  src={image}
-                  alt={property.title}
+                  src={image.url}
+                  alt={image.alt || property.title}
                   className="w-full h-full object-cover flex-shrink-0 select-none"
                   draggable="false"
                 />
@@ -538,9 +548,8 @@ const PropertyDetails = () => {
                 className="bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all duration-300 md:hover:scale-110 active:scale-95"
               >
                 <FaHeart
-                  className={`${
-                    isFavorite ? "text-red-500" : "text-gray-600"
-                  } transition-colors duration-300`}
+                  className={`${isFavorite ? "text-red-500" : "text-gray-600"
+                    } transition-colors duration-300`}
                 />
               </button>
               <button
@@ -555,23 +564,21 @@ const PropertyDetails = () => {
           {/* Thumbnail Gallery - Horizontally Scrollable */}
           <div className="overflow-x-auto no-scrollbar mt-4">
             <div
-              className={`flex gap-2 md:gap-4 p-4 w-max min-w-full md:justify-center ${
-                property.images.length <= 5 ? "justify-center" : "justify-start"
-              }`}
+              className={`flex gap-2 md:gap-4 p-4 w-max min-w-full md:justify-center ${property.images.length <= 5 ? "justify-center" : "justify-start"
+                }`}
             >
               {property.images.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentImageIndex(index)}
-                  className={`flex-shrink-0 w-[64px] md:w-24 h-12 md:h-16 rounded-lg overflow-hidden transition-all duration-300 ${
-                    currentImageIndex === index
-                      ? "ring-1 md:ring-2 ring-orange-600 scale-105"
-                      : "hover:scale-105 opacity-70 hover:opacity-100"
-                  }`}
+                  className={`flex-shrink-0 w-[64px] md:w-24 h-12 md:h-16 rounded-lg overflow-hidden transition-all duration-300 ${currentImageIndex === index
+                    ? "ring-1 md:ring-2 ring-orange-600 scale-105"
+                    : "hover:scale-105 opacity-70 hover:opacity-100"
+                    }`}
                 >
                   <img
-                    src={image}
-                    alt={`View ${index + 1}`}
+                    src={image.thumbnail || image.url}
+                    alt={image.alt || `View ${index + 1}`}
                     className="w-full h-full object-cover"
                   />
                 </button>
@@ -648,11 +655,10 @@ const PropertyDetails = () => {
                   <button
                     key={plan.id}
                     onClick={() => setSelectedPlan(plan)}
-                    className={`px-4 md:px-8 py-1.5 md:py-2.5 rounded-lg md:rounded-xl font-bold text-[11px] md:text-sm transition-all duration-300 ${
-                      selectedPlan?.id === plan.id
-                        ? "bg-gradient-to-r from-orange-600 to-orange-700 text-white shadow-md shadow-orange-200"
-                        : "text-gray-500 hover:bg-orange-50 hover:text-orange-600"
-                    }`}
+                    className={`px-4 md:px-8 py-1.5 md:py-2.5 rounded-lg md:rounded-xl font-bold text-[11px] md:text-sm transition-all duration-300 ${selectedPlan?.id === plan.id
+                      ? "bg-gradient-to-r from-orange-600 to-orange-700 text-white shadow-md shadow-orange-200"
+                      : "text-gray-500 hover:bg-orange-50 hover:text-orange-600"
+                      }`}
                   >
                     {plan.label}
                   </button>
@@ -747,15 +753,15 @@ const PropertyDetails = () => {
                 </p>
                 {property.description.length >
                   (window.innerWidth < 768 ? 168 : 335) && (
-                  <button
-                    onClick={() =>
-                      setIsDescriptionExpanded(!isDescriptionExpanded)
-                    }
-                    className="text-orange-600 font-bold text-sm mt-2 hover:text-orange-700 transition-colors duration-300"
-                  >
-                    {isDescriptionExpanded ? "Read Less" : "Read More"}
-                  </button>
-                )}
+                    <button
+                      onClick={() =>
+                        setIsDescriptionExpanded(!isDescriptionExpanded)
+                      }
+                      className="text-orange-600 font-bold text-sm mt-2 hover:text-orange-700 transition-colors duration-300"
+                    >
+                      {isDescriptionExpanded ? "Read Less" : "Read More"}
+                    </button>
+                  )}
               </div>
             </div>
 
@@ -977,10 +983,10 @@ const PropertyDetails = () => {
                     property.location?.mapUrl?.includes("google.com/maps/embed")
                       ? property.location.mapUrl
                       : `https://maps.google.com/maps?q=${encodeURIComponent(
-                          typeof property.location === "object"
-                            ? `${property.location?.address}, ${property.location?.area}, ${property.location?.city}`
-                            : property.location || "",
-                        )}&t=&z=13&ie=UTF8&iwloc=&output=embed`
+                        typeof property.location === "object"
+                          ? `${property.location?.address}, ${property.location?.area}, ${property.location?.city}`
+                          : property.location || "",
+                      )}&t=&z=13&ie=UTF8&iwloc=&output=embed`
                   }
                   width="100%"
                   height="100%"
@@ -1060,11 +1066,10 @@ const PropertyDetails = () => {
                 {property.faqs.map((faq, index) => (
                   <div
                     key={index}
-                    className={`border rounded-xl md:rounded-2xl transition-all duration-300 ${
-                      activeFaq === index
-                        ? "border-orange-500 bg-orange-50/30"
-                        : "border-gray-100 hover:border-orange-200"
-                    }`}
+                    className={`border rounded-xl md:rounded-2xl transition-all duration-300 ${activeFaq === index
+                      ? "border-orange-500 bg-orange-50/30"
+                      : "border-gray-100 hover:border-orange-200"
+                      }`}
                   >
                     <button
                       onClick={() =>
@@ -1073,18 +1078,16 @@ const PropertyDetails = () => {
                       className="w-full flex items-center justify-between p-3.5 md:p-5 text-left"
                     >
                       <span
-                        className={`font-bold text-[13px] md:text-base ${
-                          activeFaq === index
-                            ? "text-orange-600"
-                            : "text-gray-800"
-                        }`}
+                        className={`font-bold text-[13px] md:text-base ${activeFaq === index
+                          ? "text-orange-600"
+                          : "text-gray-800"
+                          }`}
                       >
                         {faq.question}
                       </span>
                       <div
-                        className={`shrink-0 ml-2 md:ml-4 transition-transform duration-300 ${
-                          activeFaq === index ? "rotate-180" : ""
-                        }`}
+                        className={`shrink-0 ml-2 md:ml-4 transition-transform duration-300 ${activeFaq === index ? "rotate-180" : ""
+                          }`}
                       >
                         <FaChevronDown
                           className={`text-xs md:text-base ${activeFaq === index ? "text-orange-600" : "text-gray-400"}`}

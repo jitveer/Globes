@@ -57,7 +57,9 @@ const AddEditProperty = () => {
     if (!imageInput) return placeholder;
 
     // Support both old string format and new optimized object format
-    const url = typeof imageInput === "string" ? imageInput : imageInput.webp;
+    const url = typeof imageInput === "string" 
+      ? imageInput 
+      : (imageInput.url || imageInput.webp || imageInput.original);
 
     if (!url) return placeholder;
     if (url.startsWith("http") || url.startsWith("data:")) return url;
@@ -92,13 +94,17 @@ const AddEditProperty = () => {
     launchDate: "",
     priceRange: "",
     description: "",
-    images: [""],
+    images: [{ url: "", alt: "" }],
     rating: 4.5,
     reviews: 0,
     furnished: "Unfurnished",
     availability: "Under Construction",
     featured: false,
     brochure: "",
+    seoTitle: "",
+    seoDescription: "",
+    seoKeywords: "",
+    featuredImageAlt: "",
   });
 
   // Track raw files for Multer
@@ -352,13 +358,28 @@ const AddEditProperty = () => {
             launchDate: prop.launchDate || "",
             priceRange: prop.priceRange || "",
             description: prop.description || "",
-            images: prop.images || [""],
+            images: prop.images && prop.images.length > 0
+              ? prop.images.map((img) => {
+                  if (typeof img === "string") return { url: img, alt: "" };
+                  return {
+                    url: img.url || img.webp || img.original || "",
+                    alt: img.alt || "",
+                    webp: img.webp || "",
+                    thumbnail: img.thumbnail || "",
+                    original: img.original || ""
+                  };
+                })
+              : [{ url: "", alt: "" }],
             rating: prop.rating || 4.5,
             reviews: prop.reviews || 0,
             furnished: prop.furnished || "Unfurnished",
             availability: prop.availability || "Under Construction",
             featured: prop.featured || false,
             brochure: prop.brochure || "",
+            seoTitle: prop.seoTitle || "",
+            seoDescription: prop.seoDescription || "",
+            seoKeywords: prop.seoKeywords || "",
+            featuredImageAlt: prop.featuredImageAlt || "",
           });
 
           if (prop.plans?.length > 0) setPlans(prop.plans);
@@ -369,10 +390,21 @@ const AddEditProperty = () => {
           if (prop.agent) setAgent(prop.agent);
 
           // Initialize input types for images
-          if (prop.images?.length > 0) {
-            setImageInputTypes(prop.images.map(() => "url"));
-            setImageFiles(prop.images.map(() => null));
-          }
+          const normalizedImages = prop.images && prop.images.length > 0
+            ? prop.images.map((img) => {
+                if (typeof img === "string") return { url: img, alt: "" };
+                return {
+                  url: img.url || img.webp || img.original || "",
+                  alt: img.alt || "",
+                  webp: img.webp || "",
+                  thumbnail: img.thumbnail || "",
+                  original: img.original || ""
+                };
+              })
+            : [{ url: "", alt: "" }];
+
+          setImageInputTypes(normalizedImages.map(() => "url"));
+          setImageFiles(normalizedImages.map(() => null));
         }
       } catch (error) {
         console.error("Error fetching property:", error);
@@ -427,7 +459,13 @@ const AddEditProperty = () => {
   // Handle image changes
   const handleImageChange = (index, value) => {
     const newImages = [...formData.images];
-    newImages[index] = value;
+    newImages[index] = { ...newImages[index], url: value };
+    setFormData((prev) => ({ ...prev, images: newImages }));
+  };
+
+  const handleImageFieldChange = (index, field, value) => {
+    const newImages = [...formData.images];
+    newImages[index] = { ...newImages[index], [field]: value };
     setFormData((prev) => ({ ...prev, images: newImages }));
   };
 
@@ -442,7 +480,9 @@ const AddEditProperty = () => {
 
       const reader = new FileReader();
       reader.onloadend = () => {
-        handleImageChange(index, reader.result);
+        const newImages = [...formData.images];
+        newImages[index] = { ...newImages[index], url: reader.result, isNew: true };
+        setFormData((prev) => ({ ...prev, images: newImages }));
       };
       reader.readAsDataURL(file);
 
@@ -458,14 +498,17 @@ const AddEditProperty = () => {
     newTypes[index] = type;
     setImageInputTypes(newTypes);
     // Clear the value when switching types to avoid confusion
-    handleImageChange(index, "");
+    const newImages = [...formData.images];
+    newImages[index] = { ...newImages[index], url: "" };
+    setFormData((prev) => ({ ...prev, images: newImages }));
+    
     const newFiles = [...imageFiles];
     newFiles[index] = null;
     setImageFiles(newFiles);
   };
 
   const addImage = () => {
-    setFormData((prev) => ({ ...prev, images: [...prev.images, ""] }));
+    setFormData((prev) => ({ ...prev, images: [...prev.images, { url: "", alt: "" }] }));
     setImageInputTypes((prev) => [...prev, "url"]);
     setImageFiles((prev) => [...prev, null]);
   };
@@ -612,11 +655,18 @@ const AddEditProperty = () => {
     // Use FormData for Multer support
     const submitData = new FormData();
 
-    // Filter out base64 images from JSON to save bandwidth, keeping URLs
+    // Filter out base64 images from JSON to save bandwidth, keeping URLs and preserving alt texts
+    const filteredImages = propertyData.images.map((img) => {
+      if (img.url && img.url.startsWith("data:")) {
+        return { ...img, url: "", isNew: true };
+      }
+      return img;
+    });
+
     const filteredPropertyData = {
       ...propertyData,
-      images: propertyData.images.filter((img) => !img.startsWith("data:")),
-      brochure: propertyData.brochure.startsWith("data:")
+      images: filteredImages,
+      brochure: propertyData.brochure && propertyData.brochure.startsWith("data:")
         ? ""
         : propertyData.brochure,
     };
@@ -1103,40 +1153,56 @@ const AddEditProperty = () => {
                     )}
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col md:flex-row gap-4">
                     {imageInputTypes[index] === "url" ? (
-                      <input
-                        type="url"
-                        value={image}
-                        onChange={(e) =>
-                          handleImageChange(index, e.target.value)
-                        }
-                        className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                        placeholder="https://example.com/image.jpg"
-                      />
+                      <div className="flex-1">
+                        <label className="block text-xs font-semibold text-gray-500 mb-1">Image Link / URL</label>
+                        <input
+                          type="url"
+                          value={image.url || ""}
+                          onChange={(e) =>
+                            handleImageFieldChange(index, "url", e.target.value)
+                          }
+                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent font-medium text-gray-700 bg-white"
+                          placeholder="https://example.com/image.jpg"
+                        />
+                      </div>
                     ) : (
                       <div className="flex-1">
+                        <label className="block text-xs font-semibold text-gray-500 mb-1">Choose File</label>
                         <input
                           type="file"
                           accept="image/*"
                           onChange={(e) => handleFileChange(index, e)}
-                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 bg-white"
+                          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 bg-white font-medium text-gray-700"
                         />
-                        {image && image.startsWith("data:") && (
+                        {image.url && image.url.startsWith("data:") && (
                           <p className="text-xs text-green-600 mt-1">
                             Image selected successfully!
                           </p>
                         )}
                       </div>
                     )}
+                    <div className="flex-1">
+                      <label className="block text-xs font-semibold text-gray-500 mb-1">Image Alt Text (SEO)</label>
+                      <input
+                        type="text"
+                        value={image.alt || ""}
+                        onChange={(e) =>
+                          handleImageFieldChange(index, "alt", e.target.value)
+                        }
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent font-medium text-gray-700 bg-white"
+                        placeholder="e.g. Living room view, swimming pool area..."
+                      />
+                    </div>
                   </div>
 
                   {/* Preview if available */}
-                  {image && (
+                  {image.url && (
                     <div className="mt-2 w-24 h-24 rounded-lg overflow-hidden border border-gray-200 relative bg-gray-100">
                       <img
                         src={getImageUrl(image)}
-                        alt="Preview"
+                        alt={image.alt || "Preview"}
                         className="w-full h-full object-cover"
                       />
                     </div>
@@ -1686,6 +1752,58 @@ const AddEditProperty = () => {
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+
+          {/* SEO Options */}
+          <div className="bg-white rounded-2xl shadow-lg p-6">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">
+              SEO Options
+            </h2>
+            <div className="grid grid-cols-1 gap-6">
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  SEO Title (Meta Title)
+                </label>
+                <input
+                  type="text"
+                  name="seoTitle"
+                  value={formData.seoTitle}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="e.g., Luxury Villas in Bangalore | Globes Properties"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  SEO Description (Meta Description)
+                </label>
+                <textarea
+                  name="seoDescription"
+                  value={formData.seoDescription}
+                  onChange={handleChange}
+                  rows="3"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent resize-none"
+                  placeholder="Brief description for search engine results..."
+                ></textarea>
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  SEO Keywords (Comma separated)
+                </label>
+                <input
+                  type="text"
+                  name="seoKeywords"
+                  value={formData.seoKeywords}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  placeholder="e.g., real estate, luxury villa, bangalore properties"
+                />
+              </div>
+
+
             </div>
           </div>
 

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import SEO from "../../components/SEO";
 import {
   FaHeart,
   FaBed,
@@ -108,6 +109,7 @@ const Wishlist = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50/20 to-gray-50 pt-20 md:pt-24 pb-12">
+      <SEO title="My Wishlist" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8 animate-[fadeInUp_0.5s_ease-out]">

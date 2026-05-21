@@ -18,8 +18,8 @@ const path = require("path");
 //   - thumbnail = progressive loading placeholder
 //   - original = backup ke liye disk pe rehega
 // ─────────────────────────────────────────────────────────────────────────────
-async function processUploadedImages(files, propertyTitle) {
-  if (!files || !files.images || files.images.length === 0) return [];
+async function processPropertyImages(files, imagesData, propertyTitle) {
+  if (!imagesData || !Array.isArray(imagesData)) return [];
 
   // Folder name: property title se sanitize karke
   const subFolder = propertyTitle
@@ -31,26 +31,68 @@ async function processUploadedImages(files, propertyTitle) {
     : "general";
 
   const destDir = path.join("uploads", "properties", subFolder);
-
+  const uploadedFiles = (files && files.images) ? [...files.images] : [];
+  
   const results = [];
+  let fileIndex = 0;
 
-  for (const file of files.images) {
+  for (const img of imagesData) {
+    let item = typeof img === "string" ? { url: img, alt: "" } : { ...img };
+
+    const isNewUpload = item.isNew === true || !item.url || item.url.startsWith("data:");
+
+    if (isNewUpload) {
+      if (fileIndex < uploadedFiles.length) {
+        const file = uploadedFiles[fileIndex];
+        fileIndex++;
+        try {
+          const optimized = await optimizeAndSaveImages(
+            file.buffer,
+            file.originalname,
+            destDir,
+          );
+          
+          item.url = optimized.webp;
+          item.webp = optimized.webp;
+          item.thumbnail = optimized.thumbnail;
+          item.original = optimized.original;
+        } catch (err) {
+          console.error(
+            `Image optimization failed for ${file.originalname}:`,
+            err.message,
+          );
+        }
+      }
+    } else {
+      if (!item.webp && item.url) {
+        item.webp = item.url;
+      }
+    }
+
+    delete item.isNew;
+    results.push(item);
+  }
+
+  // Handle any remaining files just in case
+  while (fileIndex < uploadedFiles.length) {
+    const file = uploadedFiles[fileIndex];
+    fileIndex++;
     try {
       const optimized = await optimizeAndSaveImages(
         file.buffer,
         file.originalname,
         destDir,
       );
-
-      // DB mein yeh object store hoga
       results.push({
-        webp: optimized.webp,           // Main display image (≤200KB WebP)
-        thumbnail: optimized.thumbnail, // Progressive loading thumbnail (<20KB)
-        original: optimized.original,  // Original PNG (backup, usually not shown)
+        url: optimized.webp,
+        webp: optimized.webp,
+        thumbnail: optimized.thumbnail,
+        original: optimized.original,
+        alt: "",
       });
     } catch (err) {
       console.error(
-        `Image optimization failed for ${file.originalname}:`,
+        `Image optimization failed for unmatched file ${file.originalname}:`,
         err.message,
       );
     }
@@ -86,20 +128,12 @@ exports.createProperty = asyncHandler(async (req, res) => {
   // req.body already contains merged data from parseData middleware in routes.js
   const propertyData = { ...req.body };
 
-  // Handle uploaded image files → imageOptimizer microservice
-  if (req.files && req.files.images && req.files.images.length > 0) {
-    const optimizedImages = await processUploadedImages(
-      req.files,
-      propertyData.title,
-    );
-
-    // Merge with existing image URLs/objects (filter out base64 strings if any)
-    const existingImages = (propertyData.images || []).filter((img) => {
-      if (typeof img === "string") return !img.startsWith("data:");
-      return true; // Keep existing objects/URLs
-    });
-    propertyData.images = [...existingImages, ...optimizedImages];
-  }
+  // Handle image list processing (uploads and external links)
+  propertyData.images = await processPropertyImages(
+    req.files,
+    propertyData.images,
+    propertyData.title,
+  );
 
   // Handle brochure upload (PDF - no optimization needed, save as-is)
   if (req.files && req.files.brochure && req.files.brochure.length > 0) {
@@ -165,19 +199,24 @@ exports.bulkCreateProperties = asyncHandler(async (req, res) => {
 exports.updateProperty = asyncHandler(async (req, res) => {
   const propertyData = { ...req.body };
 
-  // Handle uploaded image files → imageOptimizer microservice
-  if (req.files && req.files.images && req.files.images.length > 0) {
-    const optimizedImages = await processUploadedImages(
-      req.files,
-      propertyData.title,
-    );
-
-    const existingImages = (propertyData.images || []).filter((img) => {
-      if (typeof img === "string") return !img.startsWith("data:");
-      return true;
-    });
-    propertyData.images = [...existingImages, ...optimizedImages];
+  let propertyTitle = propertyData.title;
+  if (!propertyTitle) {
+    try {
+      const existing = await propertyService.getPropertyById(req.params.id);
+      if (existing) {
+        propertyTitle = existing.title;
+      }
+    } catch (e) {
+      // Ignore if fetch fails
+    }
   }
+
+  // Handle image list processing (uploads and external links)
+  propertyData.images = await processPropertyImages(
+    req.files,
+    propertyData.images,
+    propertyTitle,
+  );
 
   const property = await propertyService.updateProperty(
     req.params.id,

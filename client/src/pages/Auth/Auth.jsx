@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import SEO from "../../components/SEO";
 import { useNavigate, Link } from "react-router-dom";
 import {
   FaEnvelope,
@@ -178,6 +179,7 @@ const Auth = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 pt-3 md:pt-36">
+      <SEO title={isLogin ? "Login" : "Register"} />
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
           {/* Left Side - Branding */}

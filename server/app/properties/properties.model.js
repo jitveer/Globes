@@ -128,6 +128,22 @@ const propertySchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    featuredImageAlt: {
+      type: String,
+      default: "",
+    },
+    seoTitle: {
+      type: String,
+      default: "",
+    },
+    seoDescription: {
+      type: String,
+      default: "",
+    },
+    seoKeywords: {
+      type: String,
+      default: "",
+    },
   },
   {
     timestamps: true,

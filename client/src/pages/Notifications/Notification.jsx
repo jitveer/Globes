@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
+import SEO from "../../components/SEO";
 import {
   FaBell,
   FaCheck,
@@ -123,6 +124,7 @@ const Notification = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-orange-50/30 py-8 px-4 sm:px-6 lg:px-8">
+      <SEO title="Notifications" />
       <div className="max-w-4xl mx-auto">
         {/* Header Section */}
         <div className="mb-8 animate-[fadeIn_0.6s_ease-out]">

@@ -10,7 +10,6 @@ import Properties from "./pages/Properties/Properties";
 import Notification from "./pages/Notifications/Notification";
 import Post from "./pages/Post/Post";
 import Navbar from "./components/Navbar";
-import SEO from "./components/SEO";
 
 // New Pages
 import PropertyDetails from "./pages/Properties/PropertyDetails";
@@ -33,7 +32,6 @@ import { AuthProvider } from "./context/AuthContext";
 function App() {
   return (
     <AuthProvider>
-      <SEO />
       <BrowserRouter>
         <Routes>
           {/* Admin Routes (No MainLayout/Website Navbar) */}

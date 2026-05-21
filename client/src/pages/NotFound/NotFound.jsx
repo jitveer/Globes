@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import { FaHome, FaArrowLeft } from "react-icons/fa";
+import SEO from "../../components/SEO";
 
 const NotFound = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-orange-50 flex items-center justify-center px-4 mt-10 md:mt-">
+      <SEO title="Page Not Found" />
       <div className="max-w-2xl w-full text-center animate-[fadeInUp_0.6s_ease-out]">
         {/* 404 Illustration */}
         <div className="mb-8">
