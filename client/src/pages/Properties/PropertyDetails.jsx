@@ -1016,40 +1016,42 @@ const PropertyDetails = () => {
             </div>
 
             {/* Download Brochure Section */}
-            <div className="bg-gradient-to-r from-[#1B0F05] to-[#3d2511] rounded-xl md:rounded-2xl shadow-xl p-6 md:p-10 animate-[fadeInUp_0.98s_ease-out] relative overflow-hidden group">
-              {/* Decorative Background Elements */}
-              <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-orange-500/20 transition-all duration-700"></div>
-              <div className="absolute bottom-0 left-0 w-32 h-32 bg-orange-500/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl"></div>
+            {property.brochure && (
+              <div className="bg-gradient-to-r from-[#1B0F05] to-[#3d2511] rounded-xl md:rounded-2xl shadow-xl p-6 md:p-10 animate-[fadeInUp_0.98s_ease-out] relative overflow-hidden group">
+                {/* Decorative Background Elements */}
+                <div className="absolute top-0 right-0 w-64 h-64 bg-orange-500/10 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl group-hover:bg-orange-500/20 transition-all duration-700"></div>
+                <div className="absolute bottom-0 left-0 w-32 h-32 bg-orange-500/5 rounded-full translate-y-1/2 -translate-x-1/2 blur-2xl"></div>
 
-              <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
-                <div className="text-center md:text-left">
-                  <h3 className="text-xl md:text-3xl font-black text-white mb-2">
-                    Project Brochure
-                  </h3>
-                  <p className="text-gray-400 text-xs md:text-base font-medium max-w-md">
-                    Want to know more about the project? Download our detailed
-                    brochure with all floor plans and amenities.
-                  </p>
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="text-center md:text-left">
+                    <h3 className="text-xl md:text-3xl font-black text-white mb-2">
+                      Project Brochure
+                    </h3>
+                    <p className="text-gray-400 text-xs md:text-base font-medium max-w-md">
+                      Want to know more about the project? Download our detailed
+                      brochure with all floor plans and amenities.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      if (property.brochure) {
+                        const url = property.brochure.startsWith("http")
+                          ? property.brochure
+                          : `${import.meta.env.VITE_API_BASE_URL}${property.brochure}`;
+                        window.open(url, "_blank");
+                      } else {
+                        alert("Brochure not available at the moment.");
+                      }
+                    }}
+                    className="flex items-center gap-3 px-8 py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-black text-sm md:text-base shadow-lg hover:shadow-orange-500/30 transition-all duration-300 hover:-translate-y-1 active:scale-95 group/btn"
+                  >
+                    <FaDownload className="text-lg animate-bounce group-hover/btn:animate-none" />
+                    <span>Download Now</span>
+                  </button>
                 </div>
-
-                <button
-                  onClick={() => {
-                    if (property.brochure) {
-                      const url = property.brochure.startsWith("http")
-                        ? property.brochure
-                        : `${import.meta.env.VITE_API_BASE_URL}${property.brochure}`;
-                      window.open(url, "_blank");
-                    } else {
-                      alert("Brochure not available at the moment.");
-                    }
-                  }}
-                  className="flex items-center gap-3 px-8 py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-black text-sm md:text-base shadow-lg hover:shadow-orange-500/30 transition-all duration-300 hover:-translate-y-1 active:scale-95 group/btn"
-                >
-                  <FaDownload className="text-lg animate-bounce group-hover/btn:animate-none" />
-                  <span>Download Now</span>
-                </button>
               </div>
-            </div>
+            )}
 
             {/* Frequently Asked Questions */}
             <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-5 md:p-8 animate-[fadeInUp_1s_ease-out]">
@@ -1511,5 +1513,7 @@ const PropertyDetails = () => {
     </div>
   );
 };
+
+
 
 export default PropertyDetails;
