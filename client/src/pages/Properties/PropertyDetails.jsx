@@ -746,7 +746,7 @@ const PropertyDetails = () => {
                 Description
               </h2>
               <div className="relative">
-                <p className="text-sm md:text-base text-gray-600 leading-relaxed">
+                <p className="text-sm md:text-base text-gray-600 leading-relaxed whitespace-pre-line">
                   {isDescriptionExpanded
                     ? property.description
                     : `${property.description.slice(0, window.innerWidth < 768 ? 168 : 335)}${property.description.length > (window.innerWidth < 768 ? 168 : 335) ? "..." : ""}`}
