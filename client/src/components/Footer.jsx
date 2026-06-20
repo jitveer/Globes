@@ -131,7 +131,55 @@ function Footer() {
             </div>
           </div>
 
-          <div className="border-t border-gray-800 pt-8 text-center text-gray-400">
+          {/* About & Disclaimer Section */}
+          <div className="border-t border-gray-800 pt-8 mt-8 space-y-6 text-left">
+            {/* <div>
+              <h4 className="font-semibold text-white mb-3 text-sm md:text-base">About GlobesProperties.in</h4>
+              <div className="text-gray-400 space-y-3 leading-relaxed text-xs md:text-sm">
+                <p>
+                  GlobesProperties.in is a comprehensive real estate platform dedicated to helping buyers, investors, and property seekers discover residential and commercial properties across India.
+                </p>
+                <p>
+                  Our platform provides access to a wide range of real estate opportunities, including apartments, villas, independent houses, plots, commercial spaces, and newly launched projects. Users can explore under-construction developments, ready-to-move properties, investment opportunities, and resale listings through a user-friendly and organized interface.
+                </p>
+                <p>
+                  At GlobesProperties.in, we strive to simplify property discovery by presenting essential project information such as location insights, pricing details, floor plans, amenities, builder profiles, project highlights, and neighborhood information in a clear and structured format.
+                </p>
+                <p>
+                  Our goal is to connect property seekers with reliable information, helping them make informed real estate decisions while promoting transparency and accessibility within the property market.
+                </p>
+                <p>
+                  We are committed to continuously enhancing our platform, expanding our property database, and providing users with an efficient and trustworthy property search experience.
+                </p>
+              </div>
+            </div> */}
+
+            <div className="border-t border-gray-800/60 pt-6">
+              <h4 className="font-semibold text-gray-400 mb-3 text-xs md:text-sm uppercase tracking-wider">Disclaimer</h4>
+              <div className="text-gray-500 space-y-3 leading-relaxed text-[11px] md:text-xs">
+                <p>
+                  The information, images, specifications, pricing, floor plans, amenities, and other project details displayed on GlobesProperties.in are compiled from various publicly available sources, developer communications, project brochures, official websites, site visits, and information shared by property owners, builders, or authorized representatives.
+                </p>
+                <p>
+                  While we make every reasonable effort to ensure the accuracy and relevance of the information presented, certain details may be subject to change without prior notice. Some information may still be under verification and should not be considered as a final representation of the property, project, land parcel, ownership status, approvals, or regulatory compliance.
+                </p>
+                <p>
+                  Property ownership details, project approvals, RERA registrations, pricing, availability, and specifications are provided based on information obtained from sources believed to be reliable. However, GlobesProperties.in does not independently guarantee or warrant the completeness, authenticity, or accuracy of such information.
+                </p>
+                <p>
+                  Users are strongly advised to conduct their own due diligence and verify all relevant documents, approvals, legal clearances, specifications, and other property-related information directly with the developer, owner, or concerned authorities before making any purchase, investment, booking, or financial decision.
+                </p>
+                <p>
+                  GlobesProperties.in acts solely as an information and discovery platform designed to help users access property-related information in a structured and convenient manner. We continuously review and update our listings to maintain the highest possible level of accuracy and transparency.
+                </p>
+                <p>
+                  By using this website, you acknowledge that the information provided is for general informational purposes only and should not be construed as legal, financial, or investment advice.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="border-t border-gray-800 pt-8 text-center text-gray-400 mt-8">
             <p>© 2024 Globes Properties. All rights reserved.</p>
           </div>
         </div>

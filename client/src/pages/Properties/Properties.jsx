@@ -54,9 +54,9 @@ const ProgressiveImage = ({ src, thumbnailSrc, alt, className }) => {
         alt={alt}
         loading="lazy"
         className={`${className} ${hasThumbnail
-            ? `transition-opacity duration-700 ease-in-out ${isFullLoaded ? "opacity-0" : "opacity-100"
-            }`
-            : ""
+          ? `transition-opacity duration-700 ease-in-out ${isFullLoaded ? "opacity-0" : "opacity-100"
+          }`
+          : ""
           }`}
       />
     </div>
@@ -725,8 +725,8 @@ const Properties = () => {
                   <button
                     onClick={() => setViewMode("grid")}
                     className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold transition-all duration-300 text-sm md:text-base ${viewMode === "grid"
-                        ? "bg-orange-600 text-white shadow-md"
-                        : "text-gray-600 hover:bg-gray-100"
+                      ? "bg-orange-600 text-white shadow-md"
+                      : "text-gray-600 hover:bg-gray-100"
                       }`}
                   >
                     <FaThLarge />
@@ -735,8 +735,8 @@ const Properties = () => {
                   <button
                     onClick={() => setViewMode("list")}
                     className={`flex items-center gap-2 px-3 md:px-4 py-2 rounded-lg font-semibold transition-all duration-300 text-sm md:text-base ${viewMode === "list"
-                        ? "bg-orange-600 text-white shadow-md"
-                        : "text-gray-600 hover:bg-gray-100"
+                      ? "bg-orange-600 text-white shadow-md"
+                      : "text-gray-600 hover:bg-gray-100"
                       }`}
                   >
                     <FaList />
@@ -789,8 +789,8 @@ const Properties = () => {
               {!loading && filteredProperties.length > 0 && (
                 <div
                   className={`grid gap-6 ${viewMode === "grid"
-                      ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
-                      : "grid-cols-1"
+                    ? "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+                    : "grid-cols-1"
                     }`}
                 >
                   {filteredProperties.map((property, index) => (
@@ -809,8 +809,8 @@ const Properties = () => {
                         {/* Image */}
                         <div
                           className={`relative overflow-hidden ${viewMode === "grid"
-                              ? "h-64"
-                              : "w-[120px] md:w-80 h-auto md:h-full"
+                            ? "w-full aspect-[4/3]"
+                            : "w-[120px] md:w-80 aspect-[4/3]"
                             }`}
                         >
                           <ProgressiveImage
@@ -826,8 +826,8 @@ const Properties = () => {
                             {property.featured && (
                               <div
                                 className={`bg-orange-600 text-white px-2 py-0.5 rounded-full font-black shadow-md ${viewMode === "list"
-                                    ? "text-[8px]"
-                                    : "text-[10px]"
+                                  ? "text-[8px]"
+                                  : "text-[10px]"
                                   }`}
                               >
                                 Featured
@@ -836,8 +836,8 @@ const Properties = () => {
                             {property.isNewLaunch && (
                               <div
                                 className={`bg-emerald-500 text-white px-2 py-0.5 rounded-full font-black shadow-md flex items-center gap-1 ${viewMode === "list"
-                                    ? "text-[8px]"
-                                    : "text-[10px]"
+                                  ? "text-[8px]"
+                                  : "text-[10px]"
                                   }`}
                               >
                                 <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
@@ -857,8 +857,8 @@ const Properties = () => {
                           >
                             <FaHeart
                               className={`transition-colors duration-300 ${favorites.includes(property.id)
-                                  ? "text-red-500"
-                                  : "text-gray-300"
+                                ? "text-red-500"
+                                : "text-gray-300"
                                 } ${viewMode === "list" ? "text-[10px]" : "text-xs"}`}
                             />
                           </button>
@@ -866,8 +866,8 @@ const Properties = () => {
                           {/* Type Badge */}
                           <div
                             className={`absolute bottom-3 left-3 bg-white/95 backdrop-blur-sm px-2 py-1 rounded-lg flex items-center gap-1.5 shadow-sm z-10 ${viewMode === "list"
-                                ? "scale-90 origin-bottom-left"
-                                : ""
+                              ? "scale-90 origin-bottom-left"
+                              : ""
                               }`}
                           >
                             <FaHome className="text-orange-600 text-[10px]" />
@@ -885,16 +885,16 @@ const Properties = () => {
                         {/* Content */}
                         <div
                           className={`${viewMode === "list"
-                              ? "flex-1 p-2.5 flex flex-col justify-between"
-                              : "p-3 md:px-1 md:py-1"
+                            ? "flex-1 p-2.5 flex flex-col justify-between"
+                            : "p-3 md:px-1 md:py-1"
                             }`}
                         >
                           <div>
                             {/* Title */}
                             <h3
-                              className={`font-black text-gray-900 mb-1 group-hover:text-[#1B0F05] transition-colors duration-300 ${viewMode === "grid"
-                                  ? "text-lg line-clamp-2"
-                                  : "text-sm md:text-xl line-clamp-2"
+                              className={`font-black text-gray-900 mb-1 group-hover:text-[#1B0F05] transition-colors duration-300 font-semibold ${viewMode === "grid"
+                                ? "text-lg line-clamp-2"
+                                : "text-sm md:text-xl line-clamp-2"
                                 }`}
                             >
                               {property.title}
@@ -904,9 +904,9 @@ const Properties = () => {
                             <div className="flex items-center gap-1.5 text-gray-500 mb-2">
                               <FaMapMarkerAlt className="text-orange-600 flex-shrink-0 text-[10px] md:text-sm" />
                               <span
-                                className={`font-bold line-clamp-1 ${viewMode === "list"
-                                    ? "text-[10px] md:text-sm"
-                                    : "text-sm"
+                                className={`font-medium line-clamp-1 ${viewMode === "list"
+                                  ? "text-[10px] md:text-xs"
+                                  : "text-xs"
                                   }`}
                               >
                                 {typeof property.location === "object"
@@ -920,20 +920,20 @@ const Properties = () => {
                               className={`flex items-center gap-2 md:gap-4 mb-2 text-gray-500`}
                             >
                               <div className="flex items-center gap-1">
-                                <FaBed className="text-orange-600 text-[10px] md:text-base" />
-                                <span className="text-[10px] md:text-sm font-bold">
+                                <FaBed className="text-orange-600 text-[9px] md:text-xs" />
+                                <span className="text-[9px] md:text-xs font-medium">
                                   {property.beds}
                                 </span>
                               </div>
                               <div className="flex items-center gap-1">
-                                <FaBath className="text-orange-600 text-[10px] md:text-base" />
-                                <span className="text-[10px] md:text-sm font-bold">
+                                <FaBath className="text-orange-600 text-[9px] md:text-xs" />
+                                <span className="text-[9px] md:text-xs font-medium">
                                   {property.baths}
                                 </span>
                               </div>
                               <div className="flex items-center gap-1">
-                                <FaRulerCombined className="text-orange-600 text-[10px] md:text-base" />
-                                <span className="text-[10px] md:text-sm font-bold">
+                                <FaRulerCombined className="text-orange-600 text-[9px] md:text-xs" />
+                                <span className="text-[9px] md:text-xs font-medium">
                                   {property.area_sqm}{" "}
                                   <span className="hidden md:inline">sqft</span>
                                 </span>
@@ -949,26 +949,27 @@ const Properties = () => {
                             <div>
                               <p
                                 className={`text-gray-500 mb-1 ${viewMode === "list"
-                                    ? "text-xxs sm:text-xs"
-                                    : "text-xs"
+                                  ? "text-xxs sm:text-xs"
+                                  : "text-xs"
                                   }`}
                               >
                                 Starting from
                               </p>
                               <p
-                                className={`font-black text-gray-900 ${viewMode === "list"
-                                    ? "text-base md:text-2xl"
-                                    : "text-2xl"
+                                className={`font-black text-gray-900 text-md ${viewMode === "list"
+                                  ? "text-md md:text-lg"
+                                  : "text-md"
                                   }`}
                               >
-                                ₹{property.price}
+                                {property.price && property.price !== "Contact for Price" && property.price !== "N/A"
+                                  ? `₹${property.price}`
+                                  : "Contact for Price"}
                                 <span
                                   className={`font-bold text-gray-500 ${viewMode === "list"
-                                      ? "text-[10px]"
-                                      : "text-lg"
+                                    ? "text-[10px]"
+                                    : "text-md"
                                     }`}
                                 >
-                                  K
                                 </span>
                               </p>
                             </div>
@@ -977,9 +978,9 @@ const Properties = () => {
                                 e.stopPropagation();
                                 navigate(`/property/${property.id}`);
                               }}
-                              className={`bg-[#1B0F05] text-white rounded-xl font-black md:hover:bg-orange-600 transition-all duration-300 md:hover:scale-105 active:scale-90 shadow-lg ${viewMode === "list"
-                                  ? "px-3 py-1.5 text-[10px] md:text-base"
-                                  : "px-6 py-3 text-sm"
+                              className={`bg-black text-white rounded-xl font-white md:hover:bg-orange-600 transition-all duration-300 md:hover:scale-105 active:scale-90 shadow-lg ${viewMode === "list"
+                                ? "px-3 py-1.5 text-[10px] md:text-base"
+                                : "px-3 py-2 text-sm font-semibold"
                                 }`}
                             >
                               Details

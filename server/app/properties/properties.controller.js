@@ -5,6 +5,7 @@ const {
   optimizeAndSaveImages,
 } = require("../../microservices/imageOptimizer");
 const path = require("path");
+const fs = require("fs");
 
 // ─────────────────────────────────────────────────────────────────────────────
 // HELPER: Uploaded image files ko process karo via imageOptimizer microservice
@@ -24,15 +25,15 @@ async function processPropertyImages(files, imagesData, propertyTitle) {
   // Folder name: property title se sanitize karke
   const subFolder = propertyTitle
     ? propertyTitle
-        .toLowerCase()
-        .replace(/[^a-z0-9]/g, "-")
-        .replace(/-+/g, "-")
-        .replace(/^-|-$/g, "")
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
     : "general";
 
   const destDir = path.join("uploads", "properties", subFolder);
   const uploadedFiles = (files && files.images) ? [...files.images] : [];
-  
+
   const results = [];
   let fileIndex = 0;
 
@@ -51,7 +52,7 @@ async function processPropertyImages(files, imagesData, propertyTitle) {
             file.originalname,
             destDir,
           );
-          
+
           item.url = optimized.webp;
           item.webp = optimized.webp;
           item.thumbnail = optimized.thumbnail;
@@ -101,6 +102,39 @@ async function processPropertyImages(files, imagesData, propertyTitle) {
   return results;
 }
 
+// HELPER: Save brochure PDF as-is to local uploads folder
+async function saveBrochure(file, propertyTitle) {
+  if (!file) return null;
+
+  const subFolder = propertyTitle
+    ? propertyTitle
+      .toLowerCase()
+      .replace(/[^a-z0-9]/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "")
+    : "general";
+
+  const destDir = path.join("uploads", "properties", subFolder);
+
+  // 1. Destination folder ensure karo
+  if (!fs.existsSync(destDir)) {
+    fs.mkdirSync(destDir, { recursive: true });
+  }
+
+  // 2. Unique name banao
+  const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+  const ext = path.extname(file.originalname) || ".pdf";
+  const fileName = `brochure-${uniqueSuffix}${ext}`;
+  const filePath = path.join(destDir, fileName);
+
+  // 3. Write file
+  fs.writeFileSync(filePath, file.buffer);
+
+  // 4. Return URL path
+  const toUrlPath = (p) => "/" + p.replace(/\\/g, "/");
+  return toUrlPath(filePath);
+}
+
 // @desc    Get all properties
 // @route   GET /api/v1/properties
 // @access  Public
@@ -138,11 +172,21 @@ exports.createProperty = asyncHandler(async (req, res) => {
   // Handle brochure upload (PDF - no optimization needed, save as-is)
   if (req.files && req.files.brochure && req.files.brochure.length > 0) {
     const brochureFile = req.files.brochure[0];
-    // Brochure ke liye alag service baad mein add kar sakte ho
-    // Abhi ke liye brochure processing skip (PDF optimization alag topic hai)
-    console.warn(
-      "Brochure upload detected but brochure is not processed via imageOptimizer (PDF support coming soon).",
-    );
+    propertyData.brochure = await saveBrochure(brochureFile, propertyData.title);
+  }
+
+  // Handle price and plan pricing fallbacks
+  if (!propertyData.priceRange || String(propertyData.priceRange).trim() === "" || propertyData.priceRange === "N/A" || propertyData.priceRange === "Ask Price") {
+    propertyData.priceRange = "Contact for Price";
+  }
+
+  if (propertyData.plans && Array.isArray(propertyData.plans)) {
+    propertyData.plans = propertyData.plans.map(plan => {
+      if (!plan.price || String(plan.price).trim() === "" || plan.price === "N/A" || plan.price === "Ask Price") {
+        return { ...plan, price: "Contact for Price" };
+      }
+      return plan;
+    });
   }
 
   // Remove 'data' field if it exists (it's redundant now after parsing)
@@ -217,6 +261,26 @@ exports.updateProperty = asyncHandler(async (req, res) => {
     propertyData.images,
     propertyTitle,
   );
+
+  // Handle brochure upload
+  if (req.files && req.files.brochure && req.files.brochure.length > 0) {
+    const brochureFile = req.files.brochure[0];
+    propertyData.brochure = await saveBrochure(brochureFile, propertyTitle);
+  }
+
+  // Handle price and plan pricing fallbacks
+  if (!propertyData.priceRange || String(propertyData.priceRange).trim() === "" || propertyData.priceRange === "N/A" || propertyData.priceRange === "Ask Price") {
+    propertyData.priceRange = "Contact for Price";
+  }
+
+  if (propertyData.plans && Array.isArray(propertyData.plans)) {
+    propertyData.plans = propertyData.plans.map(plan => {
+      if (!plan.price || String(plan.price).trim() === "" || plan.price === "N/A" || plan.price === "Ask Price") {
+        return { ...plan, price: "Contact for Price" };
+      }
+      return plan;
+    });
+  }
 
   const property = await propertyService.updateProperty(
     req.params.id,

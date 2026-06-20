@@ -96,6 +96,8 @@ const PropertyDetails = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [isAmenitiesExpanded, setIsAmenitiesExpanded] = useState(false);
+  const [isAroundProjectExpanded, setIsAroundProjectExpanded] = useState(false);
   const [isVisitModalOpen, setIsVisitModalOpen] = useState(false);
   const [isSubmittingVisit, setIsSubmittingVisit] = useState(false);
   const [visitPopupData, setVisitPopupData] = useState({
@@ -420,32 +422,32 @@ const PropertyDetails = () => {
         </button>
 
         {/* Property Header Section - DESKTOP ONLY */}
-        <div className="mb-4 md:mb-6 hidden md:flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-6 animate-[fadeInUp_0.4s_ease-out]">
-          <div className="space-y-1.5 md:space-y-2">
-            <div className="flex flex-wrap items-center gap-2 md:gap-3">
-              <h1 className="text-xl md:text-4xl font-bold text-gray-900 leading-tight">
+        <div className="mb-4 md:mb-5 hidden md:flex flex-col md:flex-row md:items-end justify-between gap-4 md:gap-5 animate-[fadeInUp_0.4s_ease-out]">
+          <div className="space-y-1.5 md:space-y-1.5">
+            <div className="flex flex-wrap items-center gap-2 md:gap-2.5">
+              <h1 className="text-xl md:text-2xl font-semibold text-gray-900 leading-tight">
                 {property.title}
               </h1>
               {property.isNewLaunch && (
-                <span className="bg-emerald-500 text-white px-2 py-0.5 rounded-full text-[10px] md:text-xs font-bold flex items-center gap-1 shadow-sm">
+                <span className="bg-emerald-500 text-white px-2 py-0.5 rounded-full text-[10px] md:text-[11px] font-bold flex items-center gap-1 shadow-sm">
                   <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
                   New Launch
                 </span>
               )}
               {property.rera && (
-                <span className="bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded text-[9px] md:text-[10px] font-bold uppercase tracking-wider">
+                <span className="bg-blue-50 text-blue-600 border border-blue-200 px-1.5 py-0.5 rounded text-[9px] md:text-[9px] font-bold uppercase tracking-wider">
                   ✓ RERA
                 </span>
               )}
             </div>
 
-            <p className="text-[12px] md:text-sm font-semibold text-orange-600 uppercase tracking-wide">
+            <p className="text-[12px] md:text-xs font-semibold text-orange-600 uppercase tracking-wide">
               By {property.builder}
             </p>
 
             <div className="flex items-center gap-1.5 text-gray-500">
               <FaMapMarkerAlt className="text-orange-600 shrink-0 text-xs md:text-sm" />
-              <span className="text-xs md:text-base font-medium line-clamp-1">
+              <span className="text-xs md:text-sm font-medium line-clamp-1">
                 {typeof property.location === "object"
                   ? `${property.location.area}, ${property.location.city}`
                   : property.location}
@@ -453,26 +455,28 @@ const PropertyDetails = () => {
             </div>
           </div>
 
-          <div className="flex flex-col items-start md:items-end gap-2 md:gap-3">
+          <div className="flex flex-col items-start md:items-end gap-2 md:gap-2.5">
             <div className="text-left md:text-right">
               <div className="flex items-baseline gap-2 justify-start md:justify-end">
-                <span className="text-xl md:text-3xl font-extrabold text-gray-900 whitespace-nowrap">
-                  ₹{selectedPlan?.price || "N/A"}
+                <span className="text-xl md:text-xl font-extrabold text-gray-900 whitespace-nowrap">
+                  {selectedPlan?.price && selectedPlan.price !== "N/A" && selectedPlan.price !== "Ask Price" && selectedPlan.price !== "Contact for Price"
+                    ? `₹${selectedPlan.price}`
+                    : "Contact for Price"}
                 </span>
-                <span className="text-gray-400 text-[10px] md:text-sm font-medium border-l border-gray-300 pl-2">
-                  {selectedPlan?.pricePerSqft
-                    ? `₹${selectedPlan.pricePerSqft}/sq.ft`
-                    : ""}
-                </span>
+                {selectedPlan?.pricePerSqft && selectedPlan.pricePerSqft !== "N/A" && (
+                  <span className="text-gray-400 text-[10px] md:text-xs font-medium border-l border-gray-300 pl-2">
+                    ₹{selectedPlan.pricePerSqft}/sq.ft
+                  </span>
+                )}
               </div>
-              <p className="text-orange-600 text-xs md:text-sm font-bold mt-0.5">
+              <p className="text-orange-600 text-xs md:text-xs font-bold mt-0.5">
                 {selectedPlan?.emi ? `EMI starts at ₹${selectedPlan.emi}` : ""}
               </p>
             </div>
 
             <button
               onClick={() => setShowContactForm(true)}
-              className="w-full md:w-auto px-5 py-2.5 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg md:rounded-xl font-bold text-xs md:text-sm shadow-lg hover:shadow-orange-200 md:hover:-translate-y-0.5 transition-all duration-300 active:scale-95"
+              className="w-full md:w-auto px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg md:rounded-lg font-bold text-xs md:text-xs shadow-lg hover:shadow-orange-200 md:hover:-translate-y-0.5 transition-all duration-300 active:scale-95"
             >
               Contact Developer
             </button>
@@ -490,7 +494,7 @@ const PropertyDetails = () => {
             onTouchStart={onDragStart}
             onTouchMove={onDragMove}
             onTouchEnd={onDragEnd}
-            className="relative h-[300px] md:h-[500px] rounded-2xl overflow-hidden shadow-2xl group cursor-grab active:cursor-grabbing"
+            className="relative w-full aspect-[4/3] md:aspect-auto md:h-[600px] rounded-2xl overflow-hidden shadow-2xl group cursor-grab active:cursor-grabbing"
           >
             <div
               className={`flex h-full w-full ${!isDragging ? "transition-transform duration-500 ease-out" : ""
@@ -553,7 +557,21 @@ const PropertyDetails = () => {
                 />
               </button>
               <button
-                onClick={(e) => e.stopPropagation()}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (navigator.share) {
+                    navigator.share({
+                      title: property?.title || "Globes Properties",
+                      text: `Check out this amazing property: ${property?.title || ""} by ${property?.builder || "Developer"}`,
+                      url: window.location.href,
+                    })
+                      .catch((err) => console.log("Error sharing:", err));
+                  } else {
+                    navigator.clipboard.writeText(window.location.href)
+                      .then(() => alert("Property link copied to clipboard!"))
+                      .catch((err) => console.error("Clipboard copy failed:", err));
+                  }
+                }}
                 className="bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-lg hover:bg-white transition-all duration-300 md:hover:scale-110 active:scale-95"
               >
                 <FaShare className="text-gray-600" />
@@ -571,7 +589,7 @@ const PropertyDetails = () => {
                 <button
                   key={index}
                   onClick={() => setCurrentImageIndex(index)}
-                  className={`flex-shrink-0 w-[64px] md:w-24 h-12 md:h-16 rounded-lg overflow-hidden transition-all duration-300 ${currentImageIndex === index
+                  className={`flex-shrink-0 w-[64px] md:w-[56px] h-12 md:h-[36px] rounded-lg md:rounded overflow-hidden transition-all duration-300 ${currentImageIndex === index
                     ? "ring-1 md:ring-2 ring-orange-600 scale-105"
                     : "hover:scale-105 opacity-70 hover:opacity-100"
                     }`}
@@ -625,11 +643,15 @@ const PropertyDetails = () => {
             <div className="text-left">
               <div className="flex items-baseline gap-2">
                 <span className="text-xl font-extrabold text-gray-900 whitespace-nowrap">
-                  ₹{selectedPlan?.price || "N/A"}
+                  {selectedPlan?.price && selectedPlan.price !== "N/A" && selectedPlan.price !== "Ask Price" && selectedPlan.price !== "Contact for Price"
+                    ? `₹${selectedPlan.price}`
+                    : "Contact for Price"}
                 </span>
-                <span className="text-gray-400 text-[10px] font-medium border-l border-gray-300 pl-2">
-                  ₹{selectedPlan?.pricePerSqft || "N/A"}/sq.ft
-                </span>
+                {selectedPlan?.pricePerSqft && selectedPlan.pricePerSqft !== "N/A" && (
+                  <span className="text-gray-400 text-[10px] font-medium border-l border-gray-300 pl-2">
+                    ₹{selectedPlan.pricePerSqft}/sq.ft
+                  </span>
+                )}
               </div>
               <p className="text-orange-600 text-xs font-bold mt-0.5">
                 {selectedPlan?.emi ? `EMI starts at ₹${selectedPlan.emi}` : ""}
@@ -742,11 +764,11 @@ const PropertyDetails = () => {
 
             {/* Description */}
             <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-5 md:p-8 animate-[fadeInUp_0.7s_ease-out]">
-              <h2 className="text-lg md:text-2xl font-bold text-gray-900 mb-3 md:mb-4">
+              <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-3 md:mb-4">
                 Description
               </h2>
               <div className="relative">
-                <p className="text-sm md:text-base text-gray-600 leading-relaxed whitespace-pre-line">
+                <p className="text-sm md:text-md text-gray-600 leading-relaxed whitespace-pre-line">
                   {isDescriptionExpanded
                     ? property.description
                     : `${property.description.slice(0, window.innerWidth < 768 ? 168 : 335)}${property.description.length > (window.innerWidth < 768 ? 168 : 335) ? "..." : ""}`}
@@ -767,7 +789,7 @@ const PropertyDetails = () => {
 
             {/* Property Details */}
             <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-5 md:p-8 animate-[fadeInUp_0.8s_ease-out]">
-              <h2 className="text-lg md:text-2xl font-bold text-gray-900 mb-4 md:mb-6">
+              <h2 className="text-lg md:text-xl font-bold text-gray-900 mb-4 md:mb-6">
                 Property Details
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8">
@@ -775,7 +797,7 @@ const PropertyDetails = () => {
                   <span className="text-xs md:text-sm text-gray-500 font-medium">
                     Property Type
                   </span>
-                  <span className="text-xs md:text-base text-gray-900 font-bold">
+                  <span className="text-xs md:text-base text-gray-900 font-semibold">
                     {property.type}
                   </span>
                 </div>
@@ -783,7 +805,7 @@ const PropertyDetails = () => {
                   <span className="text-xs md:text-sm text-gray-500 font-medium">
                     Launch Date
                   </span>
-                  <span className="text-xs md:text-base text-gray-900 font-bold">
+                  <span className="text-xs md:text-base text-gray-900 font-semibold">
                     {property.launchDate}
                   </span>
                 </div>
@@ -791,7 +813,7 @@ const PropertyDetails = () => {
                   <span className="text-xs md:text-sm text-gray-500 font-medium">
                     Furnished
                   </span>
-                  <span className="text-xs md:text-base text-gray-900 font-bold">
+                  <span className="text-xs md:text-base text-gray-900 font-semibold">
                     {property.furnished}
                   </span>
                 </div>
@@ -807,7 +829,7 @@ const PropertyDetails = () => {
                   <span className="text-xs md:text-sm text-gray-500 font-medium">
                     Total Floors
                   </span>
-                  <span className="text-xs md:text-base text-gray-900 font-bold">
+                  <span className="text-xs md:text-base text-gray-900 font-semibold">
                     {property.totalFloors}
                   </span>
                 </div>
@@ -815,7 +837,7 @@ const PropertyDetails = () => {
                   <span className="text-xs md:text-sm text-gray-500 font-medium">
                     Total Units
                   </span>
-                  <span className="text-xs md:text-base text-gray-900 font-bold">
+                  <span className="text-xs md:text-base text-gray-900 font-semibold">
                     {property.totalUnits}
                   </span>
                 </div>
@@ -825,7 +847,7 @@ const PropertyDetails = () => {
             {/* Features & Amenities */}
             <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-5 md:p-8 animate-[fadeInUp_0.9s_ease-out]">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-6 md:mb-8">
-                <h2 className="text-lg md:text-2xl font-black text-gray-900">
+                <h2 className="text-lg md:text-xl font-black text-gray-900">
                   Amenities
                 </h2>
                 {/* <span className="text-[10px] md:text-xs bg-orange-50 text-orange-600 px-3 py-1 rounded-full font-bold uppercase tracking-wider">
@@ -850,10 +872,19 @@ const PropertyDetails = () => {
                   ];
                   const itemColor = item.color || colors[index % colors.length];
 
+                  let visibilityClass = "block";
+                  if (!isAmenitiesExpanded) {
+                    if (index >= 8) {
+                      visibilityClass = "hidden";
+                    } else if (index >= 6) {
+                      visibilityClass = "hidden md:block";
+                    }
+                  }
+
                   return (
                     <div
                       key={index}
-                      className="group relative bg-white border border-gray-100 rounded-2xl md:rounded-[2rem] p-3 md:p-5 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-200/50 hover:-translate-y-2 cursor-pointer overflow-hidden text-center"
+                      className={`${visibilityClass} group relative bg-white border border-gray-100 rounded-2xl md:rounded-[2rem] p-3 md:p-5 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-200/50 hover:-translate-y-2 cursor-pointer overflow-hidden text-center`}
                     >
                       {/* Premium Glassmorphism Background Effect */}
                       <div
@@ -882,13 +913,26 @@ const PropertyDetails = () => {
                   );
                 })}
               </div>
+
+              {/* Show More / Show Less Button */}
+              {((property.features || []).length + (property.amenities || []).length) > 6 && (
+                <div className={`mt-6 text-center ${((property.features || []).length + (property.amenities || []).length) <= 8 ? "block md:hidden" : "block"}`}>
+                  <button
+                    onClick={() => setIsAmenitiesExpanded(!isAmenitiesExpanded)}
+                    className="inline-flex items-center gap-2 px-6 py-2.5 border border-orange-600 hover:bg-orange-50 text-orange-600 rounded-xl font-bold text-xs md:text-sm transition-all duration-300 hover:shadow-md active:scale-95"
+                  >
+                    <span>{isAmenitiesExpanded ? "Show Less" : "Show More"}</span>
+                    {isAmenitiesExpanded ? <FaChevronUp className="text-xs" /> : <FaChevronDown className="text-xs" />}
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Around the Project - NEW SECTION */}
             <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-5 md:p-8 animate-[fadeInUp_0.95s_ease-out]">
               <div className="flex items-center justify-between mb-6 md:mb-8">
                 <div>
-                  <h2 className="text-lg md:text-2xl font-black text-gray-900">
+                  <h2 className="text-lg md:text-xl font-black text-gray-900">
                     Around the Project
                   </h2>
                   <p className="text-[10px] md:text-xs text-gray-400 font-bold uppercase tracking-[0.2em] mt-1">
@@ -904,57 +948,81 @@ const PropertyDetails = () => {
               </div>
 
               <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-6">
-                {property.surroundings?.map((item, index) => (
-                  <div
-                    key={index}
-                    className="group relative bg-white border border-gray-100 rounded-2xl md:rounded-[2rem] p-3 md:p-5 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-200/50 hover:-translate-y-2 cursor-pointer overflow-hidden"
-                  >
-                    {/* 3D Background Gradient Effect */}
+                {property.surroundings?.map((item, index) => {
+                  let visibilityClass = "block";
+                  if (!isAroundProjectExpanded) {
+                    if (index >= 6) {
+                      visibilityClass = "hidden";
+                    } else if (index >= 4) {
+                      visibilityClass = "hidden md:block";
+                    }
+                  }
+
+                  return (
                     <div
-                      className={`absolute -top-10 -right-10 w-24 md:w-32 h-24 md:h-32 bg-gradient-to-br ${item.color} opacity-[0.03] group-hover:opacity-10 rounded-full transition-opacity duration-500`}
-                    ></div>
-
-                    <div className="relative z-10 flex flex-col items-center text-center">
-                      {/* Icon with 3D shadow effect */}
+                      key={index}
+                      className={`${visibilityClass} group relative bg-white border border-gray-100 rounded-2xl md:rounded-[2rem] p-3 md:p-5 transition-all duration-500 hover:shadow-2xl hover:shadow-orange-200/50 hover:-translate-y-2 cursor-pointer overflow-hidden`}
+                    >
+                      {/* 3D Background Gradient Effect */}
                       <div
-                        className={`w-10 h-10 md:w-16 md:h-16 mb-3 md:mb-4 rounded-xl md:rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-500 ease-out p-2.5 md:p-4`}
-                      >
-                        <item.icon className="text-xl md:text-3xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)]" />
-                      </div>
+                        className={`absolute -top-10 -right-10 w-24 md:w-32 h-24 md:h-32 bg-gradient-to-br ${item.color} opacity-[0.03] group-hover:opacity-10 rounded-full transition-opacity duration-500`}
+                      ></div>
 
-                      <div className="space-y-0.5 md:space-y-1">
-                        <p className="text-[9px] md:text-[10px] text-gray-400 font-black uppercase tracking-wider">
-                          {item.type}
-                        </p>
-                        <h4 className="text-[11px] md:text-base font-black text-gray-900 line-clamp-1 group-hover:text-orange-600 transition-colors">
-                          {item.label}
-                        </h4>
-                        <div className="flex items-center justify-center gap-1 mt-1 md:mt-2">
-                          <div className="w-1 md:w-1.5 h-1 md:h-1.5 bg-green-500 rounded-full"></div>
-                          <span className="text-[10px] md:text-sm font-bold text-gray-500">
-                            {item.distance}{" "}
-                            <span className="text-[8px] md:text-[10px] text-gray-300 font-medium">
-                              approx.
+                      <div className="relative z-10 flex flex-col items-center text-center">
+                        {/* Icon with 3D shadow effect */}
+                        <div
+                          className={`w-10 h-10 md:w-16 md:h-16 mb-3 md:mb-4 rounded-xl md:rounded-2xl bg-gradient-to-br ${item.color} flex items-center justify-center text-white shadow-lg group-hover:scale-110 transition-transform duration-500 ease-out p-2.5 md:p-4`}
+                        >
+                          <item.icon className="text-xl md:text-3xl drop-shadow-[0_4px_4px_rgba(0,0,0,0.25)]" />
+                        </div>
+
+                        <div className="space-y-0.5 md:space-y-1">
+                          <p className="text-[9px] md:text-[10px] text-gray-400 font-black uppercase tracking-wider">
+                            {item.type}
+                          </p>
+                          <h4 className="text-[11px] md:text-base font-black text-gray-900 line-clamp-1 group-hover:text-orange-600 transition-colors">
+                            {item.label}
+                          </h4>
+                          <div className="flex items-center justify-center gap-1 mt-1 md:mt-2">
+                            <div className="w-1 md:w-1.5 h-1 md:h-1.5 bg-green-500 rounded-full"></div>
+                            <span className="text-[10px] md:text-sm font-bold text-gray-500">
+                              {item.distance}{" "}
+                              <span className="text-[8px] md:text-[10px] text-gray-300 font-medium">
+                                approx.
+                              </span>
                             </span>
-                          </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
 
-                    {/* Bottom accent line */}
-                    <div
-                      className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r ${item.color} w-0 group-hover:w-full transition-all duration-500`}
-                    ></div>
-                  </div>
-                ))}
+                      {/* Bottom accent line */}
+                      <div
+                        className={`absolute bottom-0 left-0 h-1 bg-gradient-to-r ${item.color} w-0 group-hover:w-full transition-all duration-500`}
+                      ></div>
+                    </div>
+                  );
+                })}
               </div>
+
+              {/* Show More / Show Less Button */}
+              {(property.surroundings || []).length > 4 && (
+                <div className={`mt-6 text-center ${((property.surroundings || []).length) <= 6 ? "block md:hidden" : "block"}`}>
+                  <button
+                    onClick={() => setIsAroundProjectExpanded(!isAroundProjectExpanded)}
+                    className="inline-flex items-center gap-2 px-6 py-2.5 border border-orange-600 hover:bg-orange-50 text-orange-600 rounded-xl font-bold text-xs md:text-sm transition-all duration-300 hover:shadow-md active:scale-95"
+                  >
+                    <span>{isAroundProjectExpanded ? "Show Less" : "Show More"}</span>
+                    {isAroundProjectExpanded ? <FaChevronUp className="text-xs" /> : <FaChevronDown className="text-xs" />}
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Project Location Section */}
             <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-5 md:p-8 animate-[fadeInUp_0.97s_ease-out]">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-0 md:mb-0">
                 <div>
-                  <h2 className="text-lg md:text-2xl font-black text-gray-900 flex items-center gap-3">
+                  <h2 className="text-lg md:text-xl font-black text-gray-900 flex items-center gap-3">
                     <FaMapMarkedAlt className="text-orange-600" />
                     Project Location
                   </h2>
@@ -1036,9 +1104,11 @@ const PropertyDetails = () => {
                   <button
                     onClick={() => {
                       if (property.brochure) {
+                        const baseUrl = (import.meta.env.VITE_API_BASE_URL || "").replace(/\/$/, "");
+                        const path = property.brochure.startsWith("/") ? property.brochure : `/${property.brochure}`;
                         const url = property.brochure.startsWith("http")
                           ? property.brochure
-                          : `${import.meta.env.VITE_API_BASE_URL}${property.brochure}`;
+                          : `${baseUrl}${path}`;
                         window.open(url, "_blank");
                       } else {
                         alert("Brochure not available at the moment.");
@@ -1059,7 +1129,7 @@ const PropertyDetails = () => {
                 <div className="flex items-center justify-center w-8 md:w-10 h-8 md:h-10 bg-orange-100 rounded-lg md:rounded-xl shrink-0">
                   <FaQuestionCircle className="text-orange-600 text-sm md:text-xl" />
                 </div>
-                <h2 className="text-lg md:text-2xl font-bold text-gray-900">
+                <h2 className="text-lg md:text-xl font-bold text-gray-900">
                   Frequently Asked Questions
                 </h2>
               </div>
