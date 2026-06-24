@@ -57,8 +57,8 @@ const AddEditProperty = () => {
     if (!imageInput) return placeholder;
 
     // Support both old string format and new optimized object format
-    const url = typeof imageInput === "string" 
-      ? imageInput 
+    const url = typeof imageInput === "string"
+      ? imageInput
       : (imageInput.url || imageInput.webp || imageInput.original);
 
     if (!url) return placeholder;
@@ -360,15 +360,15 @@ const AddEditProperty = () => {
             description: prop.description || "",
             images: prop.images && prop.images.length > 0
               ? prop.images.map((img) => {
-                  if (typeof img === "string") return { url: img, alt: "" };
-                  return {
-                    url: img.url || img.webp || img.original || "",
-                    alt: img.alt || "",
-                    webp: img.webp || "",
-                    thumbnail: img.thumbnail || "",
-                    original: img.original || ""
-                  };
-                })
+                if (typeof img === "string") return { url: img, alt: "" };
+                return {
+                  url: img.url || img.webp || img.original || "",
+                  alt: img.alt || "",
+                  webp: img.webp || "",
+                  thumbnail: img.thumbnail || "",
+                  original: img.original || ""
+                };
+              })
               : [{ url: "", alt: "" }],
             rating: prop.rating || 4.5,
             reviews: prop.reviews || 0,
@@ -392,15 +392,15 @@ const AddEditProperty = () => {
           // Initialize input types for images
           const normalizedImages = prop.images && prop.images.length > 0
             ? prop.images.map((img) => {
-                if (typeof img === "string") return { url: img, alt: "" };
-                return {
-                  url: img.url || img.webp || img.original || "",
-                  alt: img.alt || "",
-                  webp: img.webp || "",
-                  thumbnail: img.thumbnail || "",
-                  original: img.original || ""
-                };
-              })
+              if (typeof img === "string") return { url: img, alt: "" };
+              return {
+                url: img.url || img.webp || img.original || "",
+                alt: img.alt || "",
+                webp: img.webp || "",
+                thumbnail: img.thumbnail || "",
+                original: img.original || ""
+              };
+            })
             : [{ url: "", alt: "" }];
 
           setImageInputTypes(normalizedImages.map(() => "url"));
@@ -501,7 +501,7 @@ const AddEditProperty = () => {
     const newImages = [...formData.images];
     newImages[index] = { ...newImages[index], url: "" };
     setFormData((prev) => ({ ...prev, images: newImages }));
-    
+
     const newFiles = [...imageFiles];
     newFiles[index] = null;
     setImageFiles(newFiles);
@@ -639,7 +639,38 @@ const AddEditProperty = () => {
 
   // Submit form
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    if (e && e.preventDefault) e.preventDefault();
+
+    // Validation
+    if (!formData.title?.trim()) {
+      alert("Project Title is required.");
+      return;
+    }
+    if (!formData.type) {
+      alert("Property Type is required.");
+      return;
+    }
+    if (!formData.description?.trim()) {
+      alert("Description is required.");
+      return;
+    }
+    if (!formData.availability) {
+      alert("Availability is required.");
+      return;
+    }
+    if (!formData.location?.address?.trim()) {
+      alert("Full Address is required.");
+      return;
+    }
+    if (!formData.location?.city) {
+      alert("City is required.");
+      return;
+    }
+    if (!formData.location?.area) {
+      alert("Area is required.");
+      return;
+    }
+
     setLoading(true);
 
     const propertyData = {
@@ -959,12 +990,13 @@ const AddEditProperty = () => {
 
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Availability
+                  Availability *
                 </label>
                 <select
                   name="availability"
                   value={formData.availability}
                   onChange={handleChange}
+                  required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 >
                   <option value="Under Construction">Under Construction</option>
@@ -1010,25 +1042,27 @@ const AddEditProperty = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Full Address
+                  Full Address *
                 </label>
                 <input
                   type="text"
                   name="address"
                   value={formData.location.address}
                   onChange={handleLocationChange}
+                  required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   placeholder="e.g. Silver Oaks Main Road, Panathur"
                 />
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  City
+                  City *
                 </label>
                 <select
                   name="city"
                   value={formData.location.city}
                   onChange={handleLocationChange}
+                  required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 >
                   <option value="Bangalore">Bangalore</option>
@@ -1036,12 +1070,13 @@ const AddEditProperty = () => {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                  Area
+                  Area *
                 </label>
                 <select
                   name="area"
                   value={formData.location.area}
                   onChange={handleLocationChange}
+                  required
                   className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 >
                   <option value="">Select Area</option>
@@ -1122,22 +1157,20 @@ const AddEditProperty = () => {
                       <button
                         type="button"
                         onClick={() => handleInputTypeToggle(index, "url")}
-                        className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
-                          imageInputTypes[index] === "url"
-                            ? "bg-white text-orange-600 shadow-sm"
-                            : "text-gray-600 hover:text-gray-800"
-                        }`}
+                        className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${imageInputTypes[index] === "url"
+                          ? "bg-white text-orange-600 shadow-sm"
+                          : "text-gray-600 hover:text-gray-800"
+                          }`}
                       >
                         Link
                       </button>
                       <button
                         type="button"
                         onClick={() => handleInputTypeToggle(index, "file")}
-                        className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${
-                          imageInputTypes[index] === "file"
-                            ? "bg-white text-orange-600 shadow-sm"
-                            : "text-gray-600 hover:text-gray-800"
-                        }`}
+                        className={`px-3 py-1 rounded-md text-sm font-medium transition-all ${imageInputTypes[index] === "file"
+                          ? "bg-white text-orange-600 shadow-sm"
+                          : "text-gray-600 hover:text-gray-800"
+                          }`}
                       >
                         Upload
                       </button>
@@ -1369,25 +1402,22 @@ const AddEditProperty = () => {
                   <div
                     key={index}
                     onClick={() => toggleAmenity(amenity)}
-                    className={`cursor-pointer p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-3 ${
-                      isSelected
-                        ? "border-orange-500 bg-orange-50 shadow-md"
-                        : "border-gray-100 hover:border-orange-200 hover:bg-gray-50"
-                    }`}
+                    className={`cursor-pointer p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-3 ${isSelected
+                      ? "border-orange-500 bg-orange-50 shadow-md"
+                      : "border-gray-100 hover:border-orange-200 hover:bg-gray-50"
+                      }`}
                   >
                     <div
-                      className={`w-5 h-5 rounded border ${
-                        isSelected
-                          ? "bg-orange-500 border-orange-500"
-                          : "border-gray-300 bg-white"
-                      } flex items-center justify-center`}
+                      className={`w-5 h-5 rounded border ${isSelected
+                        ? "bg-orange-500 border-orange-500"
+                        : "border-gray-300 bg-white"
+                        } flex items-center justify-center`}
                     >
                       {isSelected && <FaCheck className="text-white text-xs" />}
                     </div>
                     <span
-                      className={`font-semibold text-sm ${
-                        isSelected ? "text-orange-700" : "text-gray-600"
-                      }`}
+                      className={`font-semibold text-sm ${isSelected ? "text-orange-700" : "text-gray-600"
+                        }`}
                     >
                       {amenity.label}
                     </span>
@@ -1478,25 +1508,22 @@ const AddEditProperty = () => {
                   <div
                     key={index}
                     onClick={() => toggleSurrounding(item)}
-                    className={`cursor-pointer p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-3 ${
-                      isSelected
-                        ? "border-orange-500 bg-orange-50 shadow-md"
-                        : "border-gray-100 hover:border-orange-200 hover:bg-gray-50"
-                    }`}
+                    className={`cursor-pointer p-4 rounded-xl border-2 transition-all duration-200 flex items-center gap-3 ${isSelected
+                      ? "border-orange-500 bg-orange-50 shadow-md"
+                      : "border-gray-100 hover:border-orange-200 hover:bg-gray-50"
+                      }`}
                   >
                     <div
-                      className={`w-5 h-5 rounded border ${
-                        isSelected
-                          ? "bg-orange-500 border-orange-500"
-                          : "border-gray-300 bg-white"
-                      } flex items-center justify-center`}
+                      className={`w-5 h-5 rounded border ${isSelected
+                        ? "bg-orange-500 border-orange-500"
+                        : "border-gray-300 bg-white"
+                        } flex items-center justify-center`}
                     >
                       {isSelected && <FaCheck className="text-white text-xs" />}
                     </div>
                     <span
-                      className={`font-semibold text-sm ${
-                        isSelected ? "text-orange-700" : "text-gray-600"
-                      }`}
+                      className={`font-semibold text-sm ${isSelected ? "text-orange-700" : "text-gray-600"
+                        }`}
                     >
                       {item.label}
                     </span>

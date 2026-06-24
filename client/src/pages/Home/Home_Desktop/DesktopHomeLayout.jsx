@@ -219,8 +219,8 @@ const DesktopHomeLayout = () => {
   ];
 
   const stats = [
-    { icon: FaHome, end: 30, suffix: "+", label: "Properties Listed" },
-    { icon: FaUsers, end: 400, suffix: "+", label: "Happy Clients" },
+    { icon: FaHome, end: 3000, suffix: "+", label: "Properties Listed" },
+    { icon: FaUsers, end: 700, suffix: "+", label: "Happy Clients" },
     { icon: FaAward, end: 10, suffix: "+", label: "Awards Won" },
     { icon: FaHandshake, end: 100, suffix: "%", label: "Satisfaction" },
   ];
@@ -303,8 +303,8 @@ const DesktopHomeLayout = () => {
     activeCategory === "all"
       ? latestRealProperties
       : latestRealProperties.filter(
-          (p) => p.property_type?.toLowerCase() === activeCategory,
-        );
+        (p) => p.property_type?.toLowerCase() === activeCategory,
+      );
 
   // Search Suggestions Logic
   useEffect(() => {
@@ -368,9 +368,8 @@ const DesktopHomeLayout = () => {
         {heroSlides.map((slide, index) => (
           <div
             key={index}
-            className={`absolute inset-0 transition-opacity duration-1000 ${
-              index === currentSlide ? "opacity-100" : "opacity-0"
-            }`}
+            className={`absolute inset-0 transition-opacity duration-1000 ${index === currentSlide ? "opacity-100" : "opacity-0"
+              }`}
           >
             <img
               src={slide.image}
@@ -478,9 +477,8 @@ const DesktopHomeLayout = () => {
             <button
               key={index}
               onClick={() => setCurrentSlide(index)}
-              className={`h-2 rounded-full transition-all duration-300 ${
-                index === currentSlide ? "w-8 bg-orange-600" : "w-2 bg-white/50"
-              }`}
+              className={`h-2 rounded-full transition-all duration-300 ${index === currentSlide ? "w-8 bg-orange-600" : "w-2 bg-white/50"
+                }`}
             />
           ))}
         </div>
@@ -493,9 +491,8 @@ const DesktopHomeLayout = () => {
             {stats.map((stat, index) => (
               <div
                 key={index}
-                className={`text-center text-white animate-[fadeInUp_${
-                  0.5 + index * 0.1
-                }s_ease-out] md:hover:scale-110 transition-transform duration-300`}
+                className={`text-center text-white animate-[fadeInUp_${0.5 + index * 0.1
+                  }s_ease-out] md:hover:scale-110 transition-transform duration-300`}
               >
                 <stat.icon className="text-xl md:text-4xl mx-auto mb-3 opacity-90" />
                 <div className="text-base font-bold mb-2 md:text-4xl">
@@ -593,9 +590,8 @@ const DesktopHomeLayout = () => {
               <div
                 key={property._id}
                 onClick={() => navigate(`/property/${property._id}`)}
-                className={`bg-white rounded-2xl shadow-lg md:hover:shadow-2xl transition-all duration-500 md:hover:scale-105 md:hover:-translate-y-2 group overflow-hidden cursor-pointer animate-[fadeInUp_${
-                  0.8 + index * 0.1
-                }s_ease-out] flex-shrink-0 w-[78vw] sm:w-[42vw] lg:w-auto`}
+                className={`bg-white rounded-2xl shadow-lg md:hover:shadow-2xl transition-all duration-500 md:hover:scale-105 md:hover:-translate-y-2 group overflow-hidden cursor-pointer animate-[fadeInUp_${0.8 + index * 0.1
+                  }s_ease-out] flex-shrink-0 w-[78vw] sm:w-[42vw] lg:w-auto`}
               >
                 {/* Image */}
                 <div className="relative overflow-hidden h-48 md:h-64">
@@ -620,11 +616,10 @@ const DesktopHomeLayout = () => {
                     className="absolute top-2 right-2 w-7 md:w-10 h-7 md:h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-lg md:hover:scale-110 transition-all duration-300 active:scale-95"
                   >
                     <FaHeart
-                      className={`transition-colors duration-300 ${
-                        favorites.includes(property._id)
-                          ? "text-red-500"
-                          : "text-gray-400"
-                      }`}
+                      className={`transition-colors duration-300 ${favorites.includes(property._id)
+                        ? "text-red-500"
+                        : "text-gray-400"
+                        }`}
                     />
                   </button>
 
@@ -738,9 +733,8 @@ const DesktopHomeLayout = () => {
             {features.map((feature, index) => (
               <div
                 key={index}
-                className={`bg-white p-4 md:p-8 rounded-2xl shadow-lg md:hover:shadow-2xl transition-all duration-500 md:hover:scale-105 md:hover:-translate-y-2 group animate-[fadeInUp_${
-                  0.8 + index * 0.1
-                }s_ease-out]`}
+                className={`bg-white p-4 md:p-8 rounded-2xl shadow-lg md:hover:shadow-2xl transition-all duration-500 md:hover:scale-105 md:hover:-translate-y-2 group animate-[fadeInUp_${0.8 + index * 0.1
+                  }s_ease-out]`}
               >
                 <div className="w-8 h-8 md:w-16 md:h-16 bg-orange-100 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-orange-600 transition-colors duration-300">
                   <feature.icon className="text-3xl text-orange-600 group-hover:text-white transition-colors duration-300" />
@@ -824,9 +818,8 @@ const DesktopHomeLayout = () => {
             {testimonials.map((testimonial, index) => (
               <div
                 key={index}
-                className={`bg-gradient-to-br from-white to-orange-50/30 p-8 rounded-2xl shadow-lg md:hover:shadow-2xl transition-all duration-500 md:hover:scale-105 md:hover:-translate-y-2 group animate-[fadeInUp_${
-                  0.8 + index * 0.1
-                }s_ease-out] border border-gray-100`}
+                className={`bg-gradient-to-br from-white to-orange-50/30 p-8 rounded-2xl shadow-lg md:hover:shadow-2xl transition-all duration-500 md:hover:scale-105 md:hover:-translate-y-2 group animate-[fadeInUp_${0.8 + index * 0.1
+                  }s_ease-out] border border-gray-100`}
               >
                 {/* Quote Icon */}
                 <div className="text-6xl text-orange-200 font-serif leading-none mb-4 group-hover:text-orange-300 transition-colors duration-300">
@@ -960,9 +953,8 @@ const DesktopHomeLayout = () => {
             ].map((faq, index) => (
               <div
                 key={index}
-                className={`bg-white rounded-2xl shadow-md md:hover:shadow-xl transition-all duration-300 overflow-hidden animate-[fadeInUp_${
-                  0.7 + index * 0.05
-                }s_ease-out]`}
+                className={`bg-white rounded-2xl shadow-md md:hover:shadow-xl transition-all duration-300 overflow-hidden animate-[fadeInUp_${0.7 + index * 0.05
+                  }s_ease-out]`}
               >
                 <button
                   onClick={() =>
@@ -974,17 +966,15 @@ const DesktopHomeLayout = () => {
                     {faq.question}
                   </h3>
                   <FaChevronDown
-                    className={`text-orange-600 text-xl flex-shrink-0 transition-transform duration-300 ${
-                      activeFaq === index ? "rotate-180" : ""
-                    }`}
+                    className={`text-orange-600 text-xl flex-shrink-0 transition-transform duration-300 ${activeFaq === index ? "rotate-180" : ""
+                      }`}
                   />
                 </button>
                 <div
-                  className={`overflow-hidden transition-all duration-500 ease-in-out ${
-                    activeFaq === index
-                      ? "max-h-96 opacity-100"
-                      : "max-h-0 opacity-0"
-                  }`}
+                  className={`overflow-hidden transition-all duration-500 ease-in-out ${activeFaq === index
+                    ? "max-h-96 opacity-100"
+                    : "max-h-0 opacity-0"
+                    }`}
                 >
                   <div className="px-6 pb-5 pt-2">
                     <p className="text-xs md:text-base text-gray-600 leading-relaxed">
@@ -1091,7 +1081,7 @@ const DesktopHomeLayout = () => {
                     } else {
                       alert(
                         data.message ||
-                          "OTP bhejne mein samasya hui. Kripya punah prayas karein.",
+                        "OTP bhejne mein samasya hui. Kripya punah prayas karein.",
                       );
                     }
                   } else {

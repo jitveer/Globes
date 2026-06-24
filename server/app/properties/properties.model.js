@@ -68,9 +68,18 @@ const propertySchema = new mongoose.Schema(
       required: [true, "Property type is required"],
     },
     location: {
-      address: String,
-      city: String,
-      area: String,
+      address: {
+        type: String,
+        required: [true, "Address is required"],
+      },
+      city: {
+        type: String,
+        required: [true, "City is required"],
+      },
+      area: {
+        type: String,
+        required: [true, "Area is required"],
+      },
       landmark: String,
       pincode: String,
       mapUrl: String,
@@ -105,7 +114,10 @@ const propertySchema = new mongoose.Schema(
       default: 0,
     },
     furnished: String,
-    availability: String,
+    availability: {
+      type: String,
+      required: [true, "Availability is required"],
+    },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

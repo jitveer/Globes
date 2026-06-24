@@ -28,6 +28,7 @@ Thumbs.db
 *.swo
 *~
 .cache/
+uploads/
 temp/
 tmp/
 coverage/

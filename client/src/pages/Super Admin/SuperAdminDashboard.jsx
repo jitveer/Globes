@@ -591,6 +591,7 @@ const SuperAdminDashboard = () => {
     { id: "logs", label: "System Logs", icon: FaHistory },
     { id: "system", label: "System Health", icon: FaServer },
     { id: "settings", label: "Platform Settings", icon: FaTools },
+    { id: "ads", label: "Ads Control", icon: FaTools },
   ];
 
   const handleLogout = () => {
@@ -743,11 +744,10 @@ const SuperAdminDashboard = () => {
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all ${
-                  activeTab === item.id
-                    ? "bg-red-600 text-white shadow-lg shadow-red-900/20"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
-                }`}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-semibold transition-all ${activeTab === item.id
+                  ? "bg-red-600 text-white shadow-lg shadow-red-900/20"
+                  : "text-slate-400 hover:text-white hover:bg-white/5"
+                  }`}
               >
                 <item.icon
                   className={
@@ -948,15 +948,14 @@ const SuperAdminDashboard = () => {
                         className="flex items-start gap-4 p-4 border border-slate-50 rounded-xl hover:shadow-md transition-shadow"
                       >
                         <div
-                          className={`mt-1 h-3 w-3 rounded-full flex-shrink-0 ${
-                            log.type === "security"
-                              ? "bg-red-500"
-                              : log.type === "server"
-                                ? "bg-purple-500"
-                                : log.type === "content"
-                                  ? "bg-orange-500"
-                                  : "bg-blue-500"
-                          }`}
+                          className={`mt-1 h-3 w-3 rounded-full flex-shrink-0 ${log.type === "security"
+                            ? "bg-red-500"
+                            : log.type === "server"
+                              ? "bg-purple-500"
+                              : log.type === "content"
+                                ? "bg-orange-500"
+                                : "bg-blue-500"
+                            }`}
                         />
                         <div className="flex-1">
                           <div className="flex items-center gap-2 mb-1">
@@ -1296,11 +1295,10 @@ const SuperAdminDashboard = () => {
                                   <div
                                     className={`
                                     w-20 h-8 rounded-full transition-all duration-300 flex items-center px-1.5 
-                                    ${
-                                      admin.isActive
+                                    ${admin.isActive
                                         ? "bg-emerald-100 border border-emerald-200"
                                         : "bg-red-100 border border-red-200"
-                                    }
+                                      }
                                   `}
                                   >
                                     <div
@@ -1317,11 +1315,10 @@ const SuperAdminDashboard = () => {
                                     <span
                                       className={`
                                       text-[10px] font-black uppercase tracking-wider w-full text-center pr-1
-                                      ${
-                                        admin.isActive
+                                      ${admin.isActive
                                           ? "text-emerald-600 pr-6"
                                           : "text-red-600 pl-6"
-                                      }
+                                        }
                                     `}
                                     >
                                       {admin.isActive ? "Active" : "OFF"}

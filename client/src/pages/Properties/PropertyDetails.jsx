@@ -580,16 +580,16 @@ const PropertyDetails = () => {
           </div>
 
           {/* Thumbnail Gallery - Horizontally Scrollable */}
-          <div className="overflow-x-auto no-scrollbar mt-4">
+          <div className="overflow-x-auto no-scrollbar mt-2 md:mt-4">
             <div
-              className={`flex gap-2 md:gap-4 p-4 w-max min-w-full md:justify-center ${property.images.length <= 5 ? "justify-center" : "justify-start"
+              className={`flex gap-2 md:gap-4 py-2 px-4 md:p-4 w-max min-w-full md:justify-center ${property.images.length <= 5 ? "justify-center" : "justify-start"
                 }`}
             >
               {property.images.map((image, index) => (
                 <button
                   key={index}
                   onClick={() => setCurrentImageIndex(index)}
-                  className={`flex-shrink-0 w-[64px] md:w-[56px] h-12 md:h-[36px] rounded-lg md:rounded overflow-hidden transition-all duration-300 ${currentImageIndex === index
+                  className={`flex-shrink-0 w-[45px] md:w-[56px] h-[34px] md:h-[36px] rounded-md md:rounded overflow-hidden transition-all duration-300 ${currentImageIndex === index
                     ? "ring-1 md:ring-2 ring-orange-600 scale-105"
                     : "hover:scale-105 opacity-70 hover:opacity-100"
                     }`}
