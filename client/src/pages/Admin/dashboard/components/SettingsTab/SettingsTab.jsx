@@ -1,6 +1,68 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 
 const SettingsTab = () => {
+  const [homePageAdVideoUrl, setHomePageAdVideoUrl] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [message, setMessage] = useState({ type: "", text: "" });
+
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/v1/settings`
+        );
+        const data = await res.json();
+        if (data.success && data.data) {
+          setHomePageAdVideoUrl(data.data.homePageAdVideoUrl || "");
+        }
+      } catch (error) {
+        console.error("Failed to load settings:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setMessage({ type: "", text: "" });
+    try {
+      const token = localStorage.getItem("accessToken");
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/settings`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ homePageAdVideoUrl }),
+        }
+      );
+      const data = await res.json();
+      if (data.success) {
+        setMessage({ type: "success", text: "Settings saved successfully!" });
+      } else {
+        setMessage({ type: "error", text: data.message || "Failed to save settings." });
+      }
+    } catch (error) {
+      console.error("Failed to save settings:", error);
+      setMessage({ type: "error", text: "Something went wrong. Please try again." });
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="w-10 h-10 border-4 border-orange-600 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-[fadeInUp_0.5s_ease-out]">
       <div>
@@ -9,6 +71,18 @@ const SettingsTab = () => {
           Manage website settings and configurations
         </p>
       </div>
+
+      {message.text && (
+        <div
+          className={`p-4 rounded-xl text-sm font-semibold ${
+            message.type === "success"
+              ? "bg-green-50 text-green-700 border border-green-200"
+              : "bg-red-50 text-red-700 border border-red-200"
+          }`}
+        >
+          {message.text}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* General Settings */}
@@ -93,11 +167,39 @@ const SettingsTab = () => {
             ))}
           </div>
         </div>
+
+        {/* Ads Settings */}
+        <div className="bg-white rounded-2xl shadow-lg p-6 lg:col-span-2">
+          <h3 className="text-xl font-bold text-gray-900 mb-4">
+            Advertisement Settings
+          </h3>
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Home Page Video Ad URL
+              </label>
+              <input
+                type="text"
+                value={homePageAdVideoUrl}
+                onChange={(e) => setHomePageAdVideoUrl(e.target.value)}
+                placeholder="Enter YouTube URL (e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ)"
+                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Enter any valid YouTube video link. It will automatically autoplay, loop, and be muted on the homepage.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex justify-end">
-        <button className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all">
-          Save Settings
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          className="bg-gradient-to-r from-orange-600 to-orange-700 text-white px-8 py-3 rounded-xl font-semibold hover:shadow-lg transition-all disabled:opacity-50"
+        >
+          {saving ? "Saving..." : "Save Settings"}
         </button>
       </div>
     </div>

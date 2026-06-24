@@ -80,7 +80,32 @@ const CountUp = ({ end, duration = 2000, suffix = "", decimals = 0 }) => {
   );
 };
 
+const getYouTubeEmbedUrl = (url) => {
+  if (!url) return "";
+  let videoId = "";
+  try {
+    if (url.includes("youtu.be/")) {
+      videoId = url.split("youtu.be/")[1].split(/[?#]/)[0];
+    } else if (url.includes("youtube.com/watch")) {
+      const urlParams = new URLSearchParams(new URL(url).search);
+      videoId = urlParams.get("v");
+    } else if (url.includes("youtube.com/embed/")) {
+      videoId = url.split("youtube.com/embed/")[1].split(/[?#]/)[0];
+    } else if (url.includes("youtube.com/shorts/")) {
+      videoId = url.split("youtube.com/shorts/")[1].split(/[?#]/)[0];
+    } else {
+      videoId = url;
+    }
+  } catch (e) {
+    videoId = url;
+  }
+  if (!videoId) return "";
+  return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&loop=1&controls=0&playlist=${videoId}&playsinline=1&showinfo=0&rel=0&modestbranding=1`;
+};
+
 const DesktopHomeLayout = () => {
+  const [showVideoAd, setShowVideoAd] = useState(true);
+  const [adVideoUrl, setAdVideoUrl] = useState("https://www.youtube.com/watch?v=dQw4w9WgXcQ"); // Add your YouTube video URL here
   const [activeCategory, setActiveCategory] = useState("all");
   const [favorites, setFavorites] = useState([]);
   const [latestRealProperties, setLatestRealProperties] = useState([]);
@@ -295,8 +320,23 @@ const DesktopHomeLayout = () => {
     }
   };
 
+  const fetchSettings = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/settings`
+      );
+      const data = await res.json();
+      if (data.success && data.data?.homePageAdVideoUrl) {
+        setAdVideoUrl(data.data.homePageAdVideoUrl);
+      }
+    } catch (error) {
+      console.error("Failed to load settings:", error);
+    }
+  };
+
   useEffect(() => {
     fetchLatestProperties();
+    fetchSettings();
   }, []);
 
   const filteredProperties =
@@ -1650,6 +1690,29 @@ const DesktopHomeLayout = () => {
         message={popupData.message}
       />
 
+      {/* Floating Video Ad Popup (Desktop Only, above WhatsApp button) */}
+      {showVideoAd && (
+        <div className="fixed bottom-32 right-8 z-50 hidden lg:block w-80 bg-white/95 backdrop-blur-md p-1.5 rounded-2xl shadow-2xl border border-gray-200/50 animate-[slideInRight_1.5s_cubic-bezier(0.19,1,0.22,1)]">
+          <div className="relative w-full aspect-video rounded-xl overflow-hidden">
+            {/* Close Button */}
+            <button
+              onClick={() => setShowVideoAd(false)}
+              className="absolute top-2 right-2 w-8 h-8 bg-black/70 hover:bg-red-600 text-white rounded-full flex items-center justify-center transition-all duration-300 z-[60] shadow-md backdrop-blur-sm cursor-pointer"
+              title="Close Ad"
+            >
+              <FaTimes className="text-xs" />
+            </button>
+            <iframe
+              src={getYouTubeEmbedUrl(adVideoUrl)}
+              title="Advertisement"
+              className="w-full h-full rounded-xl border-0 pointer-events-none"
+              allow="autoplay; encrypted-media"
+              allowFullScreen
+            ></iframe>
+          </div>
+        </div>
+      )}
+
       {/* Add new animations for modal */}
       <style>{`
         @keyframes fadeIn {
@@ -1659,6 +1722,16 @@ const DesktopHomeLayout = () => {
         @keyframes scaleIn {
           from { opacity: 0; transform: scale(0.95); }
           to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes slideInRight {
+          from {
+            opacity: 0;
+            transform: translateX(100px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
         }
       `}</style>
     </div>
