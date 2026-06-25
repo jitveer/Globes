@@ -89,6 +89,7 @@ const PropertyDetails = () => {
   const navigate = useNavigate();
   const [property, setProperty] = useState(null);
   const [selectedPlan, setSelectedPlan] = useState(null);
+  const [selectedBhkGroup, setSelectedBhkGroup] = useState("");
   const [activeFaq, setActiveFaq] = useState(-1);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -218,7 +219,17 @@ const PropertyDetails = () => {
 
           setProperty(prop);
           if (prop.plans.length > 0) {
-            setSelectedPlan(prop.plans[0]);
+            const firstPlan = prop.plans[0];
+            setSelectedPlan(firstPlan);
+
+            let firstGroup = "Other";
+            const match = firstPlan.label.match(/^(\d+(\.\d+)?)\s*BHK/i);
+            if (match) {
+              firstGroup = `${match[1]} BHK`;
+            } else {
+              firstGroup = firstPlan.label;
+            }
+            setSelectedBhkGroup(firstGroup);
           } else {
             // Provide a dummy plan if none exists to prevent rendering crashes
             setSelectedPlan({
@@ -230,6 +241,7 @@ const PropertyDetails = () => {
               baths: 0,
               area_sqm: 0,
             });
+            setSelectedBhkGroup("Other");
           }
         } else {
           setError(result.message || "Property not found");
@@ -376,6 +388,33 @@ const PropertyDetails = () => {
   };
 
   const toggleFavorite = () => setIsFavorite(!isFavorite);
+
+  // Group plans by clean BHK prefix
+  const bhkGroups = {};
+  if (property && property.plans) {
+    property.plans.forEach(plan => {
+      let groupName = "Other";
+      const match = plan.label.match(/^(\d+(\.\d+)?)\s*BHK/i);
+      if (match) {
+        groupName = `${match[1]} BHK`;
+      } else {
+        groupName = plan.label;
+      }
+      if (!bhkGroups[groupName]) {
+        bhkGroups[groupName] = [];
+      }
+      bhkGroups[groupName].push(plan);
+    });
+  }
+
+  const groupKeys = Object.keys(bhkGroups);
+
+  const handleBhkGroupSelect = (groupName) => {
+    setSelectedBhkGroup(groupName);
+    if (bhkGroups[groupName] && bhkGroups[groupName].length > 0) {
+      setSelectedPlan(bhkGroups[groupName][0]);
+    }
+  };
 
   // Early returns for loading and error states
   if (loading) {
@@ -671,21 +710,40 @@ const PropertyDetails = () => {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-4 md:space-y-6">
             {/* Plan Selection Tabs */}
-            <div className="mb-4 md:mb-6 animate-[fadeInUp_0.6s_ease-out] flex justify-center">
-              <div className="flex items-center gap-1.5 md:gap-2 p-1 md:p-1.5 bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 w-fit">
-                {property.plans.map((plan) => (
+            <div className="mb-4 md:mb-6 animate-[fadeInUp_0.6s_ease-out] flex flex-col items-center gap-3 w-full">
+              {/* Primary BHK Groups */}
+              <div className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2 p-1 md:p-1.5 bg-white rounded-xl md:rounded-2xl shadow-sm border border-gray-100 w-fit">
+                {groupKeys.map((groupName) => (
                   <button
-                    key={plan.id}
-                    onClick={() => setSelectedPlan(plan)}
-                    className={`px-4 md:px-8 py-1.5 md:py-2.5 rounded-lg md:rounded-xl font-bold text-[11px] md:text-sm transition-all duration-300 ${selectedPlan?.id === plan.id
+                    key={groupName}
+                    onClick={() => handleBhkGroupSelect(groupName)}
+                    className={`px-4 md:px-8 py-1.5 md:py-2.5 rounded-lg md:rounded-xl font-bold text-[11px] md:text-sm transition-all duration-300 ${selectedBhkGroup === groupName
                       ? "bg-gradient-to-r from-orange-600 to-orange-700 text-white shadow-md shadow-orange-200"
                       : "text-gray-500 hover:bg-orange-50 hover:text-orange-600"
                       }`}
                   >
-                    {plan.label}
+                    {groupName}
                   </button>
                 ))}
               </div>
+
+              {/* Secondary Sub-configs (Specific Options) */}
+              {bhkGroups[selectedBhkGroup] && bhkGroups[selectedBhkGroup].length > 0 && (
+                <div className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2 max-w-full px-2">
+                  {bhkGroups[selectedBhkGroup].map((plan) => (
+                    <button
+                      key={plan.id}
+                      onClick={() => setSelectedPlan(plan)}
+                      className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg border text-[10px] md:text-xs font-bold transition-all duration-300 ${selectedPlan?.id === plan.id
+                        ? "bg-orange-50 border-orange-500 text-orange-600 shadow-sm"
+                        : "bg-white border-gray-200 text-gray-500 hover:border-orange-300 hover:text-orange-600"
+                        }`}
+                    >
+                      {plan.label} {plan.area_sqm ? `(${plan.area_sqm} Sq.Ft)` : ""}
+                    </button>
+                  ))}
+                </div>
+              )}
             </div>
 
             {/* Property Highlights */}
