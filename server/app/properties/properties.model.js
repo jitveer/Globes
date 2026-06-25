@@ -7,9 +7,9 @@ const planSchema = new mongoose.Schema(
     price: String,
     pricePerSqft: String,
     emi: String,
-    beds: Number,
-    baths: Number,
-    area_sqm: Number,
+    beds: mongoose.Schema.Types.Mixed,
+    baths: mongoose.Schema.Types.Mixed,
+    area_sqm: mongoose.Schema.Types.Mixed,
   },
   { _id: false },
 );
@@ -54,7 +54,6 @@ const propertySchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: [true, "Property title is required"],
       trim: true,
     },
     builder: String,
@@ -65,20 +64,16 @@ const propertySchema = new mongoose.Schema(
     },
     type: {
       type: String, // "Apartment", "Villa", etc.
-      required: [true, "Property type is required"],
     },
     location: {
       address: {
         type: String,
-        required: [true, "Address is required"],
       },
       city: {
         type: String,
-        required: [true, "City is required"],
       },
       area: {
         type: String,
-        required: [true, "Area is required"],
       },
       landmark: String,
       pincode: String,
@@ -90,7 +85,6 @@ const propertySchema = new mongoose.Schema(
     priceRange: String,
     description: {
       type: String,
-      required: [true, "Property description is required"],
     },
     images: [mongoose.Schema.Types.Mixed],
     plans: [planSchema],
@@ -106,22 +100,19 @@ const propertySchema = new mongoose.Schema(
     },
     brochure: String,
     rating: {
-      type: Number,
+      type: mongoose.Schema.Types.Mixed,
       default: 0,
     },
     reviews: {
-      type: Number,
+      type: mongoose.Schema.Types.Mixed,
       default: 0,
     },
     furnished: String,
     availability: {
       type: String,
-      required: [true, "Availability is required"],
     },
     owner: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
+      type: mongoose.Schema.Types.Mixed,
     },
     status: {
       type: String,
@@ -133,7 +124,7 @@ const propertySchema = new mongoose.Schema(
       default: false,
     },
     views: {
-      type: Number,
+      type: mongoose.Schema.Types.Mixed,
       default: 0,
     },
     isVerified: {
@@ -168,3 +159,182 @@ propertySchema.index({ type: 1, featured: 1, status: 1 });
 
 module.exports =
   mongoose.models.Property || mongoose.model("Property", propertySchema);
+
+
+
+
+
+
+
+
+
+//   const mongoose = require("mongoose");
+
+// const planSchema = new mongoose.Schema(
+//   {
+//     id: String,
+//     label: String,
+//     price: String,
+//     pricePerSqft: String,
+//     emi: String,
+//     beds: Number,
+//     baths: Number,
+//     area_sqm: Number,
+//   },
+//   { _id: false },
+// );
+
+// const featureSchema = new mongoose.Schema(
+//   {
+//     label: String,
+//     iconName: String,
+//     color: String,
+//   },
+//   { _id: false },
+// );
+
+// const amenitySchema = new mongoose.Schema(
+//   {
+//     label: String,
+//     iconName: String,
+//   },
+//   { _id: false },
+// );
+
+// const surroundingSchema = new mongoose.Schema(
+//   {
+//     label: String,
+//     iconName: String,
+//     distance: String,
+//     type: String,
+//     color: String,
+//   },
+//   { _id: false },
+// );
+
+// const faqSchema = new mongoose.Schema(
+//   {
+//     question: String,
+//     answer: String,
+//   },
+//   { _id: false },
+// );
+
+// const propertySchema = new mongoose.Schema(
+//   {
+//     title: {
+//       type: String,
+//       required: [true, "Property title is required"],
+//       trim: true,
+//     },
+//     builder: String,
+//     rera: String,
+//     isNewLaunch: {
+//       type: Boolean,
+//       default: false,
+//     },
+//     type: {
+//       type: String, // "Apartment", "Villa", etc.
+//       required: [true, "Property type is required"],
+//     },
+//     location: {
+//       address: {
+//         type: String,
+//         required: [true, "Address is required"],
+//       },
+//       city: {
+//         type: String,
+//         required: [true, "City is required"],
+//       },
+//       area: {
+//         type: String,
+//         required: [true, "Area is required"],
+//       },
+//       landmark: String,
+//       pincode: String,
+//       mapUrl: String,
+//     },
+//     totalFloors: String,
+//     totalUnits: String,
+//     launchDate: String,
+//     priceRange: String,
+//     description: {
+//       type: String,
+//       required: [true, "Property description is required"],
+//     },
+//     images: [mongoose.Schema.Types.Mixed],
+//     plans: [planSchema],
+//     features: [featureSchema],
+//     amenities: [amenitySchema],
+//     surroundings: [surroundingSchema],
+//     faqs: [faqSchema],
+//     agent: {
+//       name: String,
+//       phone: String,
+//       email: String,
+//       image: String,
+//     },
+//     brochure: String,
+//     rating: {
+//       type: Number,
+//       default: 0,
+//     },
+//     reviews: {
+//       type: Number,
+//       default: 0,
+//     },
+//     furnished: String,
+//     availability: {
+//       type: String,
+//       required: [true, "Availability is required"],
+//     },
+//     owner: {
+//       type: mongoose.Schema.Types.ObjectId,
+//       ref: "User",
+//       required: true,
+//     },
+//     status: {
+//       type: String,
+//       enum: ["active", "sold", "rented", "inactive"],
+//       default: "active",
+//     },
+//     featured: {
+//       type: Boolean,
+//       default: false,
+//     },
+//     views: {
+//       type: Number,
+//       default: 0,
+//     },
+//     isVerified: {
+//       type: Boolean,
+//       default: false,
+//     },
+//     featuredImageAlt: {
+//       type: String,
+//       default: "",
+//     },
+//     seoTitle: {
+//       type: String,
+//       default: "",
+//     },
+//     seoDescription: {
+//       type: String,
+//       default: "",
+//     },
+//     seoKeywords: {
+//       type: String,
+//       default: "",
+//     },
+//   },
+//   {
+//     timestamps: true,
+//   },
+// );
+
+// // Indexes
+// propertySchema.index({ title: "text", location: "text" });
+// propertySchema.index({ type: 1, featured: 1, status: 1 });
+
+// module.exports =
+//   mongoose.models.Property || mongoose.model("Property", propertySchema);

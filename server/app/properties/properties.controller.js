@@ -7,18 +7,7 @@ const {
 const path = require("path");
 const fs = require("fs");
 
-// ─────────────────────────────────────────────────────────────────────────────
-// HELPER: Uploaded image files ko process karo via imageOptimizer microservice
-// Har image ke liye 3 versions banega:
-//   /{destDir}/img-xxx.png           → Original
-//   /{destDir}/img-xxx.webp          → Optimized WebP (≤ 200 KB)
-//   /{destDir}/img-xxx_thum.webp     → Thumbnail WebP (< 20 KB, blurred)
-//
-// DB mein sirf { webp, thumbnail } store hoga kyunki:
-//   - webp = main display image
-//   - thumbnail = progressive loading placeholder
-//   - original = backup ke liye disk pe rehega
-// ─────────────────────────────────────────────────────────────────────────────
+////////
 async function processPropertyImages(files, imagesData, propertyTitle) {
   if (!imagesData || !Array.isArray(imagesData)) return [];
 
