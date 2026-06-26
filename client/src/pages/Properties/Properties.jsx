@@ -94,18 +94,64 @@ const Properties = () => {
   }, []);
 
   // Filter states
-  const [filters, setFilters] = useState({
-    search: urlSearch,
-    propertyType: "all",
-    location: "",
-    minPrice: 0,
-    maxPrice: 30000,
-    minArea: 0,
-    maxArea: 10000,
-    bedrooms: "all",
-    bathrooms: "all",
-    sortBy: "newest",
+  const [filters, setFilters] = useState(() => {
+    const savedFilters = sessionStorage.getItem("propertiesFilters");
+    if (savedFilters) {
+      try {
+        const parsed = JSON.parse(savedFilters);
+        if (urlSearch) {
+          parsed.search = urlSearch;
+        }
+        return parsed;
+      } catch (e) {
+        console.error("Failed to parse saved filters:", e);
+      }
+    }
+    return {
+      search: urlSearch,
+      propertyType: "all",
+      location: "",
+      minPrice: 0,
+      maxPrice: 30000,
+      minArea: 0,
+      maxArea: 10000,
+      bedrooms: "all",
+      bathrooms: "all",
+      sortBy: "newest",
+    };
   });
+
+  // Sync filters to sessionStorage
+  useEffect(() => {
+    sessionStorage.setItem("propertiesFilters", JSON.stringify(filters));
+  }, [filters]);
+
+  // Save scroll position when user scrolls, but only after loading is false to avoid 0 scroll reset
+  useEffect(() => {
+    if (loading) return;
+    const handleSaveScroll = () => {
+      sessionStorage.setItem("propertiesScrollY", window.scrollY);
+    };
+    window.addEventListener("scroll", handleSaveScroll);
+    return () => window.removeEventListener("scroll", handleSaveScroll);
+  }, [loading]);
+
+  // Restore scroll position when properties are loaded and rendered
+  useEffect(() => {
+    if (!loading && properties.length > 0) {
+      const savedScrollY = sessionStorage.getItem("propertiesScrollY");
+      if (savedScrollY) {
+        const scrollTarget = parseInt(savedScrollY, 10);
+        const timer = setTimeout(() => {
+          window.scrollTo({
+            top: scrollTarget,
+            behavior: "instant"
+          });
+        }, 100);
+        return () => clearTimeout(timer);
+      }
+    }
+  }, [loading, properties]);
 
   // Helper: relative path ko full URL mein convert karo
   const buildUrl = (relativePath) => {
@@ -350,14 +396,16 @@ const Properties = () => {
 
   // Reset filters
   const resetFilters = () => {
+    sessionStorage.removeItem("propertiesScrollY");
+    sessionStorage.removeItem("propertiesFilters");
     setFilters({
       search: "",
       propertyType: "all",
       location: "",
-      minPrice: "0",
-      maxPrice: "30000",
-      minArea: "0",
-      maxArea: "10000",
+      minPrice: 0,
+      maxPrice: 30000,
+      minArea: 0,
+      maxArea: 10000,
       bedrooms: "all",
       bathrooms: "all",
       sortBy: "newest",
