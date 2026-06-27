@@ -53,6 +53,10 @@ const sendSMSOTP = async (phone, otp) => {
     if (data.type === "success") {
       console.log(`✅ OTP successfully sent to ${mobile}`);
       return true;
+    } else if (data.message && data.message.includes("IP is not whitelisted") && process.env.NODE_ENV === "development") {
+      console.warn("⚠️ [MSG91] Local IP not whitelisted. Bypassing for local testing.");
+      console.log(`[LOCAL DEV OTP]: ${otp}`);
+      return true;
     } else {
       console.error("❌ MSG91 Failed:", data.message || JSON.stringify(data));
       return false;
