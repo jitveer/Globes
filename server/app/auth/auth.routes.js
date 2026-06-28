@@ -11,5 +11,6 @@ router.post("/register", authLimiter, authValidator.register, authController.reg
 router.post("/login", authLimiter, authValidator.login, authController.login);
 router.post("/super-admin/login", authLimiter, authValidator.login, authController.superAdminLogin);
 router.post("/admin/login", authLimiter, authValidator.login, authController.adminLogin);
+router.post("/check-user", authController.checkUser);
 
 module.exports = router;

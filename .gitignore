@@ -33,3 +33,8 @@ temp/
 tmp/
 coverage/
 .nyc_output/
+
+# Custom files to ignore
+slvsunshine.php
+send-otp.php
+

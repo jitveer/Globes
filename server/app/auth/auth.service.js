@@ -192,3 +192,13 @@ exports.adminLogin = async ({ email, password }) => {
     refreshToken,
   };
 };
+
+exports.checkUserExists = async ({ email, phone }) => {
+  const existingUser = await User.findOne({
+    $or: [
+      ...(email ? [{ email }] : []),
+      ...(phone ? [{ phone }] : [])
+    ]
+  });
+  return !!existingUser;
+};

@@ -65,3 +65,36 @@ exports.verifyOtp = async (req, res) => {
     });
   }
 };
+
+exports.resendOtp = async (req, res) => {
+  try {
+    const { recipient } = req.body;
+
+    if (!recipient) {
+      return res.status(400).json({
+        success: false,
+        message: "Recipient is required.",
+      });
+    }
+
+    const resent = await otpService.resendOTP(recipient);
+
+    if (resent) {
+      return res.status(200).json({
+        success: true,
+        message: "OTP resent successfully.",
+      });
+    } else {
+      return res.status(500).json({
+        success: false,
+        message: "Failed to resend OTP. Please try again later.",
+      });
+    }
+  } catch (error) {
+    console.error("Resend OTP Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal server error.",
+    });
+  }
+};

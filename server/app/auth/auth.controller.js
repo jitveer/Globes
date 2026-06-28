@@ -24,3 +24,15 @@ exports.adminLogin = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, result, "Administrator Login successful"));
 });
+
+exports.checkUser = asyncHandler(async (req, res) => {
+  const { email, phone } = req.body;
+  const exists = await authService.checkUserExists({ email, phone });
+  if (exists) {
+    return res.status(400).json({
+      success: false,
+      message: "User already exists with this email or phone"
+    });
+  }
+  res.status(200).json(new ApiResponse(200, null, "User does not exist"));
+});

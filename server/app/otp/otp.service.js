@@ -1,106 +1,230 @@
 const OTP = require("./otp.model");
 
 /**
- * Generate a 6-digit random OTP
+ * GENERATE A 4-DIGIT RANDOM OTP FOR TEMPORARY REFERENCE
  */
 const generateOTP = () => {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return Math.floor(1000 + Math.random() * 9000).toString();
 };
 
+
+
+
+
 /**
- * Send OTP via MSG91 SMS
+ * FORWARD OTP TO WORDPRESS GATEWAY FOR SMS DELIVERY
+ * NOTE: WORDPRESS SENDS ITS OWN GENERATED OTP AND IGNORES THE ONE PASSED FROM NODE.JS
  */
 const sendSMSOTP = async (phone, otp) => {
-  const authKey = process.env.MSG91_AUTHKEY;
-  const templateId = process.env.MSG91_TEMPLATE;
-
-  if (!authKey || !templateId || authKey === "your_msg91_authkey") {
-    console.warn("--- MSG91 Credentials Missing or Placeholder ---");
-    console.warn(`TESTING MODE: OTP for ${phone} is: ${otp}`);
-    return true;
-  }
+  const secretKey = process.env.WP_OTP_SECRET || "change-me-to-secure-string"; // SHARED SECRET KEY FOR API AUTHENTICATION
+  const wpUrl = process.env.WP_OTP_URL || "https://globesproperties.com/wp-content/plugins/custom-contact-form/send-otp.php";
 
   try {
-    // Format mobile number: remove all non-digits
-    let mobile = phone.replace(/\D/g, "");
-    // If it's 10 digits, assume India (91)
-    if (mobile.length === 10) {
-      mobile = "91" + mobile;
-    }
-
-    console.log(`Attempting to send OTP ${otp} to ${mobile}...`);
-
-    // MSG91 v5 OTP API Call
-    const response = await fetch("https://control.msg91.com/api/v5/otp", {
+    const response = await fetch(wpUrl, {
       method: "POST",
       headers: {
-        authkey: authKey,
         "Content-Type": "application/json",
-        Accept: "application/json",
+        "X-COTL-SECRET": secretKey
       },
       body: JSON.stringify({
-        template_id: templateId,
-        mobile: mobile,
-        otp: otp,
-        otp_expiry: 10, // 10 minutes
-        realTimeResponse: 1,
-      }),
+        action: "send_otp",
+        phone: phone,
+        otp: otp
+      })
     });
 
     const data = await response.json();
-    console.log("MSG91 Response Data:", JSON.stringify(data));
+    console.log("WordPress PHP OTP Response:", JSON.stringify(data));
 
-    if (data.type === "success") {
-      console.log(`✅ OTP successfully sent to ${mobile}`);
-      return true;
-    } else if (data.message && data.message.includes("IP is not whitelisted") && process.env.NODE_ENV === "development") {
-      console.warn("⚠️ [MSG91] Local IP not whitelisted. Bypassing for local testing.");
-      console.log(`[LOCAL DEV OTP]: ${otp}`);
+    if (data.status === "success" || (data.raw && data.raw.type === "success")) {
+      console.log(`✅ OTP successfully triggered via WordPress API for ${phone}`);
       return true;
     } else {
-      console.error("❌ MSG91 Failed:", data.message || JSON.stringify(data));
+      console.error("❌ WordPress API Failed:", data.message || JSON.stringify(data));
+
+      // DEVELOPMENT FALLBACK BYPASS IN CASE LOCAL NETWORK BLOCKS CONNECTION
+      if (process.env.NODE_ENV === "development") {
+        console.warn("⚠️ Bypassed WordPress failure in Development. Testing OTP is:", otp);
+        return true;
+      }
       return false;
     }
   } catch (error) {
-    console.error("❌ MSG91 Request Error:", error.message);
+    console.error("❌ WordPress API Request Error:", error.message);
+
+    // DEVELOPMENT FALLBACK BYPASS TO PREVENT CRASH DURING OFFLINE DEVELOPMENT
+    if (process.env.NODE_ENV === "development") {
+      console.warn("⚠️ Bypassed connection crash in Development. Testing OTP is:", otp);
+      return true;
+    }
     return false;
   }
 };
 
+
+
+
+
+
+
+
 /**
- * Main function to send OTP
+ * MAIN FUNCTION TO TRIGGER AND RECORD OTP SENDING
  */
 exports.sendOTP = async (recipient, type) => {
   const otp = generateOTP();
 
-  // Save OTP to DB with 10 mins expiry
+  // SAVE OTP TO DB WITH 10 MINUTES EXPIRY AS A BACKUP RECORD
   await OTP.findOneAndUpdate(
     { recipient },
     {
       otp,
-      type: "phone", // Forced to phone as per user request
+      type: "phone", // FORCED TO PHONE MODE AS PER REQUIREMENT
       verified: false,
       expiresAt: new Date(Date.now() + 10 * 60 * 1000),
     },
     { upsert: true, new: true },
   );
 
-  // Send via SMS only
+  // TRIGGER DELIVERY THROUGH THE SMS GATEWAY
   return await sendSMSOTP(recipient, otp);
 };
 
+
+
+
+
+
 /**
- * Verify OTP
+ * VERIFY THE OTP ENTERED BY USER AGAINST LOCAL DB AND WORDPRESS GATEWAY
  */
 exports.verifyOTP = async (recipient, otp) => {
-  const otpRecord = await OTP.findOne({ recipient, otp, verified: false });
+  const secretKey = process.env.WP_OTP_SECRET || "change-me-to-secure-string"; // SHARED SECRET KEY FOR API AUTHENTICATION
+  const wpUrl = process.env.WP_OTP_URL || "https://globesproperties.com/wp-content/plugins/custom-contact-form/send-otp.php";
 
-  if (!otpRecord) return false;
+  try {
+    console.log(`Verifying OTP ${otp} for ${recipient}...`);
 
-  // Check expiry
-  if (otpRecord.expiresAt < new Date()) return false;
+    // CHECK LOCALLY FIRST (WORKS IF LOCAL DB MATCHES GENERATED CODE AND HAS NOT EXPIRED)
+    const localRecord = await OTP.findOne({ recipient, otp, verified: false });
+    if (localRecord) {
+      if (localRecord.expiresAt > new Date()) {
+        localRecord.verified = true;
+        await localRecord.save();
+        console.log("✅ OTP successfully verified locally via Database matching.");
+        return true;
+      } else {
+        console.warn("❌ Local OTP has expired.");
+      }
+    }
 
-  otpRecord.verified = true;
-  await otpRecord.save();
-  return true;
+    // SECONDARY FALLBACK VALIDATION AGAINST WORDPRESS GATEWAY
+    // REQUIRED BECAUSE WORDPRESS GENERATES ITS OWN SMS OTP SEPARATE FROM NODE.JS SERVER
+    const response = await fetch(wpUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-COTL-SECRET": secretKey
+      },
+      body: JSON.stringify({
+        action: "verify_otp",
+        phone: recipient,
+        otp: otp
+      })
+    });
+
+    const data = await response.json();
+    console.log("WordPress Verification Response:", JSON.stringify(data));
+
+    // CHECK SUCCESS SIGNALS RETURNED BY WORDPRESS GATEWAY (E.G. TYPE IS SUCCESS OR MOBILE ALREADY VERIFIED)
+    const isSuccess = data.status === "success" ||
+      data.type === "success" ||
+      (data.raw && data.raw.type === "success") ||
+      (data.message && data.message.includes("already verified"));
+
+    if (isSuccess) {
+      await OTP.findOneAndUpdate({ recipient }, { verified: true });
+      return true;
+    }
+
+    return false;
+  } catch (error) {
+    console.error("❌ Verification Flow Error:", error.message);
+
+    // DEVELOPMENT FALLBACK BYPASS TO PERVENT FLOW BLOCKAGE DURING LOCAL TESTING
+    if (process.env.NODE_ENV === "development") {
+      return true;
+    }
+    return false;
+  }
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * RESEND OTP VIA WORDPRESS GATEWAY RETRY ENDPOINT
+ */
+exports.resendOTP = async (recipient) => {
+  const secretKey = process.env.WP_OTP_SECRET || "change-me-to-secure-string"; // SHARED SECRET KEY FOR API AUTHENTICATION
+  const wpUrl = process.env.WP_OTP_URL || "https://globesproperties.com/wp-content/plugins/custom-contact-form/send-otp.php";
+
+  try {
+    console.log(`Resending OTP for ${recipient}...`);
+
+    // FIND THE EXISTING RECORD AND EXTEND THE EXPIRY SO THE DB RECORD STAYS VALID FOR verification CHECK
+    const existingRecord = await OTP.findOne({ recipient, verified: false });
+    if (existingRecord) {
+      existingRecord.expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+      await existingRecord.save();
+    }
+
+    const response = await fetch(wpUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-COTL-SECRET": secretKey
+      },
+      body: JSON.stringify({
+        action: "resend_otp",
+        phone: recipient
+      })
+    });
+
+    const data = await response.json();
+    console.log("WordPress Resend OTP Response:", JSON.stringify(data));
+
+    const isSuccess = data.status === "success" || data.type === "success" || (data.raw && data.raw.type === "success");
+
+    if (isSuccess) {
+      console.log(`✅ OTP successfully resent via WordPress API for ${recipient}`);
+      return true;
+    }
+
+    if (process.env.NODE_ENV === "development") {
+      console.warn("⚠️ Bypassed WordPress resend failure in Development.");
+      return true;
+    }
+    return false;
+  } catch (error) {
+    console.error("❌ Resend OTP Flow Error:", error.message);
+    if (process.env.NODE_ENV === "development") {
+      return true;
+    }
+    return false;
+  }
+};
+
+
+
+//Jeet

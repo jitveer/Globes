@@ -13,6 +13,7 @@ import {
   FaFacebook,
 } from "react-icons/fa";
 import OTPVerification from "../../components/OTP/OTPVerification";
+import Popup from "../../components/Popup";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -28,6 +29,24 @@ const Auth = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showOtpModal, setShowOtpModal] = useState(false);
+
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+    onCloseCallback: null
+  });
+
+  const showPopup = (type, title, message, onCloseCallback = null) => {
+    setPopup({
+      isOpen: true,
+      type,
+      title,
+      message,
+      onCloseCallback
+    });
+  };
 
   const [loginData, setLoginData] = useState({
     email: "",
@@ -49,11 +68,11 @@ const Auth = () => {
     // --- Validation Logic ---
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(loginData.email)) {
-      alert("Kripya ek valid email address bharein.");
+      showPopup("warning", "Invalid Input", "Please enter a valid email address.");
       return;
     }
     if (loginData.password.length === 0) {
-      alert("Password bharna zaroori hai.");
+      showPopup("warning", "Required Field", "Password is required.");
       return;
     }
     // --- End Validation ---
@@ -77,21 +96,25 @@ const Auth = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Login successful! Welcome back.");
-        // Store tokens and user details
         if (data.data && data.data.accessToken) {
           login(data.data.user, data.data.accessToken);
         }
-        navigate("/user_dashboard");
+        showPopup("success", "Success", "Login successful! Welcome back.", () => {
+          navigate("/user_dashboard");
+        });
       } else {
-        alert(
-          data.message || "Login failed. Kripya apne credentials check karein.",
+        showPopup(
+          "error",
+          "Login Failed",
+          data.message || "Login failed. Please check your credentials."
         );
       }
     } catch (error) {
       console.error("Login error:", error);
-      alert(
-        "Server se connect nahi ho pa rahe. Kripya check karein ki server chal raha hai.",
+      showPopup(
+        "error",
+        "Connection Error",
+        "Failed to connect to the server. Please check if the server is running."
       );
     } finally {
       setLoading(false);
@@ -107,32 +130,58 @@ const Auth = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!nameRegex.test(registerData.firstName)) {
-      alert("Kripya sahi First Name bharein (sirf characters allow hain).");
+      showPopup("warning", "Invalid Input", "Please enter a valid First Name (only letters allowed).");
       return;
     }
     if (registerData.lastName && !nameRegex.test(registerData.lastName)) {
-      alert("Kripya sahi Last Name bharein (sirf characters allow hain).");
+      showPopup("warning", "Invalid Input", "Please enter a valid Last Name (only letters allowed).");
       return;
     }
     if (!emailRegex.test(registerData.email)) {
-      alert("Kripya ek valid email address bharein.");
+      showPopup("warning", "Invalid Input", "Please enter a valid email address.");
       return;
     }
     if (!phoneRegex.test(registerData.phone)) {
-      alert("Kripya 10-digit ka mobile number bharein (starting with 6-9).");
+      showPopup("warning", "Invalid Input", "Please enter a valid 10-digit phone number (starting with 6-9).");
       return;
     }
     if (registerData.password.length < 8) {
-      alert("Password kam se kam 8 characters ka hona chahiye.");
+      showPopup("warning", "Weak Password", "Password must be at least 8 characters long.");
       return;
     }
     if (registerData.password !== registerData.confirmPassword) {
-      alert("Passwords mismatch! Dono password ek jaise hone chahiye.");
+      showPopup("warning", "Password Mismatch", "Passwords mismatch! Both passwords must match.");
       return;
     }
     // --- End Validation ---
 
-    setShowOtpModal(true);
+    setLoading(true);
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/auth/check-user`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: registerData.email,
+            phone: registerData.phone,
+          }),
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        showPopup("warning", "User Exists", data.message || "User already exists with this email or phone.");
+        return;
+      }
+      setShowOtpModal(true);
+    } catch (error) {
+      console.error("Check user error:", error);
+      showPopup("error", "Server Error", "Server check failed. Please check if the backend server is running.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const completeRegistration = async () => {
@@ -158,19 +207,21 @@ const Auth = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Registration successful! Welcome to Globes Properties.");
-        // Store token if needed or navigate
         if (data.data && data.data.accessToken) {
           login(data.data.user, data.data.accessToken);
         }
-        navigate("/user_dashboard");
+        showPopup("success", "Success", "Registration successful! Welcome to Globes Properties.", () => {
+          navigate("/user_dashboard");
+        });
       } else {
-        alert(data.message || data.errors?.[0]?.msg || "Registration failed");
+        showPopup("error", "Registration Failed", data.message || data.errors?.[0]?.msg || "Registration failed");
       }
     } catch (error) {
       console.error("Registration error:", error);
-      alert(
-        "An error occurred during registration. Please check if the server is running.",
+      showPopup(
+        "error",
+        "Server Error",
+        "An error occurred during registration. Please check if the server is running."
       );
     } finally {
       setLoading(false);
@@ -231,21 +282,19 @@ const Auth = () => {
               <div className="flex gap-2 mb-8 bg-gray-100 p-1 rounded-xl">
                 <button
                   onClick={() => setIsLogin(true)}
-                  className={`flex-1 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                    isLogin
-                      ? "bg-gradient-to-r from-orange-600 to-orange-700 text-white shadow-lg"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
+                  className={`flex-1 py-3 rounded-lg font-semibold transition-all duration-300 ${isLogin
+                    ? "bg-gradient-to-r from-orange-600 to-orange-700 text-white shadow-lg"
+                    : "text-gray-600 hover:text-gray-900"
+                    }`}
                 >
                   Login
                 </button>
                 <button
                   onClick={() => setIsLogin(false)}
-                  className={`flex-1 py-3 rounded-lg font-semibold transition-all duration-300 ${
-                    !isLogin
-                      ? "bg-gradient-to-r from-orange-600 to-orange-700 text-white shadow-lg"
-                      : "text-gray-600 hover:text-gray-900"
-                  }`}
+                  className={`flex-1 py-3 rounded-lg font-semibold transition-all duration-300 ${!isLogin
+                    ? "bg-gradient-to-r from-orange-600 to-orange-700 text-white shadow-lg"
+                    : "text-gray-600 hover:text-gray-900"
+                    }`}
                 >
                   Register
                 </button>
@@ -590,6 +639,19 @@ const Auth = () => {
           completeRegistration();
         }}
         onCancel={() => setShowOtpModal(false)}
+      />
+
+      <Popup
+        isOpen={popup.isOpen}
+        type={popup.type}
+        title={popup.title}
+        message={popup.message}
+        onClose={() => {
+          setPopup((prev) => ({ ...prev, isOpen: false }));
+          if (popup.onCloseCallback) {
+            popup.onCloseCallback();
+          }
+        }}
       />
     </div>
   );

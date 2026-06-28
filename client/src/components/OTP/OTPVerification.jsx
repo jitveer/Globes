@@ -10,7 +10,7 @@ import { FaShieldAlt, FaTimes } from "react-icons/fa";
  * @param {boolean} isOpen - Control visibility from outside.
  */
 const OTPVerification = ({ recipient, type, onVerify, onCancel, isOpen }) => {
-  const [otp, setOtp] = useState(["", "", "", "", "", ""]);
+  const [otp, setOtp] = useState(["", "", "", ""]);
   const [timer, setTimer] = useState(60);
   const [canResend, setCanResend] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -67,10 +67,36 @@ const OTPVerification = ({ recipient, type, onVerify, onCancel, isOpen }) => {
     }
   };
 
+  const handleResendOTP = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/otp/resend`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ recipient }),
+        }
+      );
+      const data = await response.json();
+      if (!response.ok) {
+        setError(data.message || "Failed to resend OTP. Please try again.");
+      } else {
+        setTimer(60);
+        setCanResend(false);
+      }
+    } catch (err) {
+      setError("Network error. Please check your connection.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleVerifyOTP = async () => {
     const otpString = otp.join("");
-    if (otpString.length < 6) {
-      setError("Please enter the complete 6-digit OTP.");
+    if (otpString.length < 4) {
+      setError("Please enter the complete 4-digit OTP.");
       return;
     }
 
@@ -106,7 +132,7 @@ const OTPVerification = ({ recipient, type, onVerify, onCancel, isOpen }) => {
     setOtp(newOtp);
 
     // Move to next input
-    if (value && index < 5) {
+    if (value && index < 3) {
       inputRefs.current[index + 1].focus();
     }
   };
@@ -136,7 +162,7 @@ const OTPVerification = ({ recipient, type, onVerify, onCancel, isOpen }) => {
             </div>
             <h2 className="text-2xl font-bold">OTP Verification</h2>
             <p className="text-orange-100 text-sm mt-1">
-              We've sent a 6-digit code to <br />
+              We've sent a 4-digit code to <br />
               <span className="font-semibold">{recipient}</span>
             </p>
           </div>
@@ -150,7 +176,7 @@ const OTPVerification = ({ recipient, type, onVerify, onCancel, isOpen }) => {
             </div>
           )}
 
-          <div className="flex justify-between gap-2 mb-8">
+          <div className="flex justify-center gap-4 mb-8">
             {otp.map((digit, index) => (
               <input
                 key={index}
@@ -160,7 +186,7 @@ const OTPVerification = ({ recipient, type, onVerify, onCancel, isOpen }) => {
                 value={digit}
                 onChange={(e) => handleChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
-                className="w-12 h-14 text-center text-2xl font-bold border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all duration-200"
+                className="w-14 h-16 text-center text-3xl font-bold border-2 border-gray-200 rounded-xl focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all duration-200"
               />
             ))}
           </div>
@@ -172,7 +198,7 @@ const OTPVerification = ({ recipient, type, onVerify, onCancel, isOpen }) => {
               </p>
             ) : (
               <button
-                onClick={handleSendOTP}
+                onClick={handleResendOTP}
                 disabled={loading}
                 className="text-orange-600 font-bold text-sm hover:text-orange-700 underline underline-offset-4"
               >
@@ -191,7 +217,8 @@ const OTPVerification = ({ recipient, type, onVerify, onCancel, isOpen }) => {
         </div>
       </div>
 
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         @keyframes scaleIn {
           from { transform: scale(0.9); opacity: 0; }
           to { transform: scale(1); opacity: 1; }
