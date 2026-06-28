@@ -21,6 +21,7 @@ import {
 import { useState, useEffect, useRef } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import Popup from "./Popup";
 
 const Navbar = () => {
   const { user, logout, notifications, unreadCount, markNotificationAsRead } =
@@ -37,7 +38,13 @@ const Navbar = () => {
   const [showNotifDropdown, setShowNotifDropdown] = useState(false);
   const notifTimeoutRef = useRef(null);
 
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
   const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
     logout();
     navigate("/login");
   };
@@ -795,6 +802,14 @@ const Navbar = () => {
           }
         }
       `}</style> */}
+      <Popup
+        isOpen={showLogoutConfirm}
+        type="warning"
+        title="Logout"
+        message="Are you sure you want to log out?"
+        onConfirm={confirmLogout}
+        onClose={() => setShowLogoutConfirm(false)}
+      />
     </>
   );
 };

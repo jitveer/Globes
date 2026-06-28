@@ -96,10 +96,10 @@ const Auth = () => {
       const data = await response.json();
 
       if (response.ok) {
-        if (data.data && data.data.accessToken) {
-          login(data.data.user, data.data.accessToken);
-        }
         showPopup("success", "Success", "Login successful! Welcome back.", () => {
+          if (data.data && data.data.accessToken) {
+            login(data.data.user, data.data.accessToken);
+          }
           navigate("/user_dashboard");
         });
       } else {
@@ -207,10 +207,10 @@ const Auth = () => {
       const data = await response.json();
 
       if (response.ok) {
-        if (data.data && data.data.accessToken) {
-          login(data.data.user, data.data.accessToken);
-        }
         showPopup("success", "Success", "Registration successful! Welcome to Globes Properties.", () => {
+          if (data.data && data.data.accessToken) {
+            login(data.data.user, data.data.accessToken);
+          }
           navigate("/user_dashboard");
         });
       } else {

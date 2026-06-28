@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import SEO from "../../components/SEO";
+import Popup from "../../components/Popup";
 import {
   FaUser,
   FaHeart,
@@ -102,6 +103,7 @@ const UserDashboard = () => {
   } = useAuth();
   const location = useLocation();
   const [user, setUser] = useState(null);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const [activeTab, setActiveTab] = useState(() => {
     // Check for tab parameter in URL first
     const params = new URLSearchParams(location.search);
@@ -162,6 +164,10 @@ const UserDashboard = () => {
   }, [contextUser, authLoading, navigate]);
 
   const handleLogout = () => {
+    setShowLogoutConfirm(true);
+  };
+
+  const confirmLogout = () => {
     logout();
     navigate("/login");
   };
@@ -836,6 +842,14 @@ const UserDashboard = () => {
           </main>
         </div>
       </div>
+      <Popup
+        isOpen={showLogoutConfirm}
+        type="warning"
+        title="Logout"
+        message="Are you sure you want to log out?"
+        onConfirm={confirmLogout}
+        onClose={() => setShowLogoutConfirm(false)}
+      />
     </div>
   );
 };
