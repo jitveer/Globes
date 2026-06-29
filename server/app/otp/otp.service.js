@@ -16,8 +16,8 @@ const generateOTP = () => {
  * NOTE: WORDPRESS SENDS ITS OWN GENERATED OTP AND IGNORES THE ONE PASSED FROM NODE.JS
  */
 const sendSMSOTP = async (phone, otp) => {
-  const secretKey = process.env.WP_OTP_SECRET || "change-me-to-secure-string"; // SHARED SECRET KEY FOR API AUTHENTICATION
-  const wpUrl = process.env.WP_OTP_URL || "https://globesproperties.com/wp-content/plugins/custom-contact-form/send-otp.php";
+  const secretKey = process.env.WP_OTP_SECRET
+  const wpUrl = process.env.WP_OTP_URL
 
   try {
     const response = await fetch(wpUrl, {
@@ -99,9 +99,8 @@ exports.sendOTP = async (recipient, type) => {
  * VERIFY THE OTP ENTERED BY USER AGAINST LOCAL DB AND WORDPRESS GATEWAY
  */
 exports.verifyOTP = async (recipient, otp) => {
-  const secretKey = process.env.WP_OTP_SECRET || "change-me-to-secure-string"; // SHARED SECRET KEY FOR API AUTHENTICATION
-  const wpUrl = process.env.WP_OTP_URL || "https://globesproperties.com/wp-content/plugins/custom-contact-form/send-otp.php";
-
+  const secretKey = process.env.WP_OTP_SECRET
+  const wpUrl = process.env.WP_OTP_URL
   try {
     console.log(`Verifying OTP ${otp} for ${recipient}...`);
 
@@ -176,8 +175,8 @@ exports.verifyOTP = async (recipient, otp) => {
  * RESEND OTP VIA WORDPRESS GATEWAY RETRY ENDPOINT
  */
 exports.resendOTP = async (recipient) => {
-  const secretKey = process.env.WP_OTP_SECRET || "change-me-to-secure-string"; // SHARED SECRET KEY FOR API AUTHENTICATION
-  const wpUrl = process.env.WP_OTP_URL || "https://globesproperties.com/wp-content/plugins/custom-contact-form/send-otp.php";
+  const secretKey = process.env.WP_OTP_SECRET
+  const wpUrl = process.env.WP_OTP_URL
 
   try {
     console.log(`Resending OTP for ${recipient}...`);
@@ -224,7 +223,3 @@ exports.resendOTP = async (recipient) => {
     return false;
   }
 };
-
-
-
-//Jeet
