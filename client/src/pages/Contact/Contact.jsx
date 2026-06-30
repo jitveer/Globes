@@ -8,6 +8,7 @@ import {
 } from "react-icons/fa";
 import Footer from "../../components/Footer";
 import SEO from "../../components/SEO";
+import Popup from "../../components/Popup";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -22,6 +23,17 @@ const Contact = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [botField, setBotField] = useState(""); // Honeypot field
 
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+  });
+
+  const showPopup = (type, title, message) => {
+    setPopup({ isOpen: true, type, title, message });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -35,15 +47,15 @@ const Contact = () => {
 
     if (!showOtpField) {
       if (!nameRegex.test(formData.name)) {
-        alert("Kripya sahi naam bharein (sirf characters allow hain).");
+        showPopup("warning", "Invalid Name", "Fill the correct name");
         return;
       }
       if (!emailRegex.test(formData.email)) {
-        alert("Kripya ek valid email address bharein.");
+        showPopup("warning", "Invalid Email", "Please fill the correct email");
         return;
       }
       if (!phoneRegex.test(formData.phone)) {
-        alert("Kripya 10-digit ka mobile number bharein.");
+        showPopup("warning", "Invalid Phone", "Fill the correct 10 digit mobile number");
         return;
       }
     }
@@ -64,9 +76,9 @@ const Contact = () => {
         const data = await res.json();
         if (data.success) {
           setShowOtpField(true);
-          alert("OTP Sent");
+          showPopup("success", "OTP Sent", "Validation code sent to your mobile number");
         } else {
-          alert(data.message || "Something went wrong.");
+          showPopup("error", "Error", data.message || "Something went wrong.");
         }
       } else {
         // Step 2: Verify OTP
@@ -80,26 +92,26 @@ const Contact = () => {
         );
         const data = await res.json();
         if (data.success) {
-          alert("Thank you! Your inquiry has been submitted successfully.");
+          showPopup("success", "Success", "Thank you! Your inquiry has been submitted successfully.");
           setFormData({ name: "", email: "", phone: "", message: "" });
           setOtp("");
           setShowOtpField(false);
         } else {
-          alert(data.message || "Invalid OTP!");
+          showPopup("error", "Verification Failed", data.message || "Invalid OTP!");
         }
       }
     } catch (err) {
-      alert("Server error. Please try again.");
+      showPopup("error", "Server Error", "Server error. Please try again.");
     } finally {
       setIsVerifying(false);
     }
   };
   return (
     <>
-      <SEO 
-        title="Contact Us" 
-        description="Get in touch with Globes Properties. Contact us for any real estate inquiries in Bangalore." 
-        keywords="Contact Globes Properties, real estate contact, property inquiry Bangalore" 
+      <SEO
+        title="Contact Us"
+        description="Get in touch with Globes Properties. Contact us for any real estate inquiries in Bangalore."
+        keywords="Contact Globes Properties, real estate contact, property inquiry Bangalore"
       />
       <div className="bg-gray-50 text-gray-800 antialiased"></div>
       <section className="relative">
@@ -297,22 +309,22 @@ const Contact = () => {
                   {showOtpField && (
                     <div className="animate-[slideUp_0.4s_ease-out] bg-orange-50 p-6 rounded-2xl border-2 border-orange-200">
                       <label className="block text-center text-xs font-bold text-orange-600 mb-3 uppercase tracking-widest">
-                        Verify Email OTP
+                        Verify Mobile OTP
                       </label>
                       <input
                         type="text"
                         required
-                        maxLength="6"
+                        maxLength="4"
                         inputMode="numeric"
                         value={otp}
                         onChange={(e) =>
                           setOtp(e.target.value.replace(/\D/g, ""))
                         }
-                        placeholder="••••••"
+                        placeholder="••••"
                         className="w-full border-2 border-orange-500 rounded-2xl px-5 py-4 text-center text-3xl font-black tracking-[10px] focus:outline-none bg-white placeholder:tracking-normal"
                       />
                       <p className="text-center text-xs text-gray-500 mt-2 italic">
-                        Validation code sent to your inbox
+                        Validation code sent to your mobile number
                       </p>
                     </div>
                   )}
@@ -392,6 +404,13 @@ const Contact = () => {
           to { opacity: 1; }
         }
       `}</style>
+      <Popup
+        isOpen={popup.isOpen}
+        type={popup.type}
+        title={popup.title}
+        message={popup.message}
+        onClose={() => setPopup({ ...popup, isOpen: false })}
+      />
       <Footer />
     </>
   );

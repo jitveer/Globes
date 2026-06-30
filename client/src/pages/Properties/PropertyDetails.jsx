@@ -1396,18 +1396,18 @@ const PropertyDetails = () => {
                   {showOtpField && (
                     <div className="animate-[slideUp_0.4s_ease-out] bg-orange-50 p-4 border-2 border-orange-200 rounded-xl">
                       <label className="block text-center text-[10px] font-bold text-orange-600 mb-2 uppercase tracking-widest">
-                        Email Verification OTP
+                        Mobile Verification OTP
                       </label>
                       <input
                         type="text"
                         required
-                        maxLength="6"
+                        maxLength="4"
                         inputMode="numeric"
                         value={otp}
                         onChange={(e) =>
                           setOtp(e.target.value.replace(/\D/g, ""))
                         }
-                        placeholder="••••••"
+                        placeholder="••••"
                         className="w-full px-4 py-2 border-2 border-orange-500 rounded-lg focus:ring-4 focus:ring-orange-500/10 outline-none bg-white text-center text-2xl font-black tracking-[8px] placeholder:tracking-normal"
                       />
                     </div>

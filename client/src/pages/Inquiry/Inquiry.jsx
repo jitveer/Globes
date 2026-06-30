@@ -377,22 +377,22 @@ const Inquiry = () => {
                 {showOtpField && (
                   <div className="animate-[slideUp_0.4s_ease-out] bg-orange-50 p-8 border-2 border-orange-200 rounded-2xl text-center">
                     <label className="block text-sm font-black text-orange-600 mb-4 uppercase tracking-[0.2em]">
-                      Verify Email OTP
+                      Verify Mobile OTP
                     </label>
                     <input
                       type="text"
                       required
-                      maxLength="6"
+                      maxLength="4"
                       inputMode="numeric"
                       value={otp}
                       onChange={(e) =>
                         setOtp(e.target.value.replace(/\D/g, ""))
                       }
-                      placeholder="••••••"
+                      placeholder="••••"
                       className="w-full max-w-[300px] px-4 py-4 border-2 border-orange-500 rounded-2xl focus:ring-8 focus:ring-orange-500/10 outline-none bg-white text-center text-4xl font-black tracking-[12px] placeholder:tracking-normal"
                     />
                     <p className="text-sm text-gray-500 mt-4 italic">
-                      Sent to {formData.email}
+                      Sent to {formData.phone}
                     </p>
                   </div>
                 )}

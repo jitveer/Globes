@@ -1270,20 +1270,20 @@ const DesktopHomeLayout = () => {
                       <input
                         type="text"
                         required
-                        maxLength="6"
+                        maxLength="4"
                         inputMode="numeric"
                         value={otp}
                         onChange={(e) =>
                           setOtp(e.target.value.replace(/\D/g, ""))
                         }
-                        placeholder="••••••"
+                        placeholder="••••"
                         className="w-full max-w-[280px] px-4 py-5 border-2 border-orange-500 rounded-2xl focus:ring-8 focus:ring-orange-500/10 outline-none bg-white text-center text-4xl font-black tracking-[15px] placeholder:tracking-normal placeholder:opacity-30"
                       />
                     </div>
                     <p className="text-gray-500 text-sm font-medium text-center">
                       Ek special OTP{" "}
                       <span className="text-orange-600 font-bold">
-                        {formData.email}
+                        {formData.phone}
                       </span>{" "}
                       par bheja gaya hai.
                     </p>
