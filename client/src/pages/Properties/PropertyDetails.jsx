@@ -44,6 +44,7 @@ import {
 } from "react-icons/fa";
 import Popup from "../../components/Popup";
 import SEO from "../../components/SEO";
+import WhatsAppButton from "../../components/WhatsAppButton";
 
 const iconMap = {
   FaBed,
@@ -145,6 +146,13 @@ const PropertyDetails = () => {
     const path = url.startsWith("/") ? url : `/${url}`;
 
     return `${baseUrl}${path}`;
+  };
+
+  const getWhatsAppNumber = (phone) => {
+    const fallbackNumber = import.meta.env.VITE_WHATSAPP_PHONE_NUMBER || "919945739702";
+    const targetPhone = phone || fallbackNumber;
+    const cleaned = targetPhone.replace(/\D/g, "");
+    return cleaned.startsWith("91") || cleaned.length > 10 ? cleaned : `91${cleaned}`;
   };
 
   // Carousel drag state
@@ -1284,7 +1292,7 @@ const PropertyDetails = () => {
                     </span>
                   </a>
                   <a
-                    href={`https://wa.me/918889270860?text=Hello%20${encodeURIComponent(property.agent?.name || "Agent")},%20I'm%20interested%20in%20your%20property%20"${encodeURIComponent(property.title)}".%20Please%20share%20more%20details.`}
+                    href={`https://wa.me/${getWhatsAppNumber(property.agent?.phone)}?text=Hello%20${encodeURIComponent(property.agent?.name || "Agent")},%20I'm%20interested%20in%20your%20property%20"${encodeURIComponent(property.title)}".%20Please%20share%20more%20details.`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="flex items-center gap-2 md:gap-3 p-2.5 md:p-3 bg-[#25D366]/10 rounded-lg md:rounded-xl hover:bg-[#25D366]/20 transition-colors duration-300 group"
@@ -1437,27 +1445,10 @@ const PropertyDetails = () => {
         </div>
       </div>
 
-      {/* Floating WhatsApp Button */}
-      <a
-        href={`https://wa.me/918889270860?text=Hello%20Globes%20Properties,%20I'm%20interested%20in%20"${property.title}".%20Please%20provide%20more%20details.`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-[#25D366] text-white rounded-full shadow-[0_10px_25px_rgba(37,211,102,0.4)] hover:shadow-[0_15px_30px_rgba(37,211,102,0.5)] transition-all duration-300 hover:scale-110 active:scale-90 group"
-        title="Chat on WhatsApp"
-      >
-        {/* Pulse Ripple Effect */}
-        <div className="absolute inset-0 rounded-full bg-[#25D366] animate-ping opacity-20 group-hover:opacity-40"></div>
-
-        {/* 3D Glass Effect Inner Circle */}
-        <div className="absolute inset-1 rounded-full bg-gradient-to-tr from-white/10 to-transparent border border-white/20"></div>
-
-        <FaWhatsapp className="text-3xl md:text-4xl relative z-10 drop-shadow-lg" />
-
-        {/* Tooltip for desktop */}
-        <span className="absolute right-full mr-4 px-3 py-1.5 bg-white text-gray-800 text-xs font-bold rounded-lg shadow-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap hidden md:block border border-gray-100">
-          Chat with us!
-        </span>
-      </a>
+      <WhatsAppButton
+        phone={property.agent?.phone}
+        text={`Hello Globes Properties, I'm interested in "${property.title}". Please provide more details.`}
+      />
       {/* Schedule Visit Modal */}
       {isVisitModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.3s_ease-out]">

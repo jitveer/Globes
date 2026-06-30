@@ -1312,7 +1312,12 @@ const Properties = () => {
             </div>
           </div>
         </div>
+
+
       )}
+
+
+
 
       {/* Custom Animations */}
       <style jsx>{`

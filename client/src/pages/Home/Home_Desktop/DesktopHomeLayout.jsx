@@ -104,6 +104,13 @@ const getYouTubeEmbedUrl = (url) => {
 };
 
 const DesktopHomeLayout = () => {
+  const getWhatsAppNumber = () => {
+    const rawNumber = import.meta.env.VITE_WHATSAPP_PHONE_NUMBER || "919945739702";
+    const cleanNumber = rawNumber.replace(/\D/g, "");
+    return cleanNumber.startsWith("91") || cleanNumber.length > 10 ? cleanNumber : `91${cleanNumber}`;
+  };
+  const whatsappPhone = getWhatsAppNumber();
+
   const [showVideoAd, setShowVideoAd] = useState(true);
   const [adVideoUrl, setAdVideoUrl] = useState("https://www.youtube.com/watch?v=dQw4w9WgXcQ"); // Add your YouTube video URL here
   const [activeCategory, setActiveCategory] = useState("all");
@@ -1043,7 +1050,7 @@ const DesktopHomeLayout = () => {
                 Call Us Now
               </a>
               <a
-                href="https://wa.me/919945739702"
+                href={`https://wa.me/${whatsappPhone}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="bg-green-500 text-white px-3 md:px-8 py-3.5 rounded-xl font-bold md:hover:bg-green-600 transition-all duration-300 md:hover:scale-105 active:scale-95 shadow-lg flex items-center justify-center gap-2 flex-1 sm:flex-initial"
@@ -1441,30 +1448,6 @@ const DesktopHomeLayout = () => {
         }
       `}</style>
 
-      {/* Sticky WhatsApp Button */}
-      <a
-        href="https://wa.me/919945739702?text=Hello! I'm interested in your properties."
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-8 right-8 z-50 group"
-      >
-        <div className="relative">
-          {/* Pulsing Ring Animation */}
-          <div className="absolute inset-0 bg-green-500 rounded-full animate-ping opacity-75"></div>
-
-          {/* Main Button */}
-          <div className="relative w-16 h-16 bg-green-500 md:hover:bg-green-600 rounded-full flex items-center justify-center shadow-2xl md:hover:shadow-green-500/50 transition-all duration-300 md:hover:scale-110 active:scale-95">
-            <FaWhatsapp className="text-white text-3xl" />
-          </div>
-
-          {/* Tooltip */}
-          <div className="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-gray-900 text-white px-4 py-2 rounded-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none shadow-xl">
-            <span className="font-medium">Chat with us on WhatsApp</span>
-            {/* Arrow */}
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-full w-0 h-0 border-t-8 border-t-transparent border-b-8 border-b-transparent border-l-8 border-l-gray-900"></div>
-          </div>
-        </div>
-      </a>
 
       {/* Meeting Schedule Modal */}
       {isModalOpen && (

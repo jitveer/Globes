@@ -144,32 +144,27 @@ const Navbar = () => {
     <>
       {/* Mobile Header (visible on mobile only) - Always Sticky */}
       <header
-        className={`lg:hidden sticky top-0 z-50 w-full px-4 py-3 bg-white flex justify-between items-center transition-shadow duration-300 ${
-          isScrolled ? "shadow-lg" : "shadow-md"
-        }`}
+        className={`lg:hidden sticky top-0 z-50 w-full px-4 py-3 bg-white flex justify-between items-center transition-shadow duration-300 ${isScrolled ? "shadow-lg" : "shadow-md"
+          }`}
       >
         {/* Hamburger Menu Button */}
         <div
-          className={`flex justify-center items-center p-2 rounded-full cursor-pointer transition-all duration-300 ${
-            menubar ? "bg-orange-100" : "hover:bg-orange-50"
-          }`}
+          className={`flex justify-center items-center p-2 rounded-full cursor-pointer transition-all duration-300 ${menubar ? "bg-orange-100" : "hover:bg-orange-50"
+            }`}
           onClick={menubarmenu}
         >
           <div className="relative w-6 h-6 flex items-center justify-center">
             <span
-              className={`absolute h-0.5 w-5 bg-orange-600 transition-all duration-300 ease-in-out ${
-                menubar ? "rotate-45 translate-y-0" : "-translate-y-1.5"
-              }`}
+              className={`absolute h-0.5 w-5 bg-orange-600 transition-all duration-300 ease-in-out ${menubar ? "rotate-45 translate-y-0" : "-translate-y-1.5"
+                }`}
             ></span>
             <span
-              className={`absolute h-0.5 w-5 bg-orange-600 transition-all duration-300 ease-in-out ${
-                menubar ? "opacity-0 scale-0" : "opacity-100 scale-100"
-              }`}
+              className={`absolute h-0.5 w-5 bg-orange-600 transition-all duration-300 ease-in-out ${menubar ? "opacity-0 scale-0" : "opacity-100 scale-100"
+                }`}
             ></span>
             <span
-              className={`absolute h-0.5 w-5 bg-orange-600 transition-all duration-300 ease-in-out ${
-                menubar ? "-rotate-45 translate-y-0" : "translate-y-1.5"
-              }`}
+              className={`absolute h-0.5 w-5 bg-orange-600 transition-all duration-300 ease-in-out ${menubar ? "-rotate-45 translate-y-0" : "translate-y-1.5"
+                }`}
             ></span>
           </div>
         </div>
@@ -253,36 +248,32 @@ const Navbar = () => {
                     <button
                       key={location.id}
                       onClick={() => handleLocationSelect(location.name)}
-                      className={`w-full text-left px-4 py-4 rounded-xl mb-2 transition-all duration-200 ${
-                        selectedLocation === location.name
-                          ? "bg-orange-50 border-2 border-orange-500"
-                          : "bg-gray-50 border-2 border-transparent hover:border-orange-200"
-                      } animate-[slideIn_${0.3 + index * 0.05}s_ease-out]`}
+                      className={`w-full text-left px-4 py-4 rounded-xl mb-2 transition-all duration-200 ${selectedLocation === location.name
+                        ? "bg-orange-50 border-2 border-orange-500"
+                        : "bg-gray-50 border-2 border-transparent hover:border-orange-200"
+                        } animate-[slideIn_${0.3 + index * 0.05}s_ease-out]`}
                     >
                       <div className="flex items-start gap-3">
                         <div
-                          className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${
-                            selectedLocation === location.name
-                              ? "bg-orange-500"
-                              : "bg-white"
-                          }`}
+                          className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${selectedLocation === location.name
+                            ? "bg-orange-500"
+                            : "bg-white"
+                            }`}
                         >
                           <FaMapMarkerAlt
-                            className={`text-lg ${
-                              selectedLocation === location.name
-                                ? "text-white"
-                                : "text-orange-600"
-                            }`}
+                            className={`text-lg ${selectedLocation === location.name
+                              ? "text-white"
+                              : "text-orange-600"
+                              }`}
                           />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-center justify-between gap-2 mb-1">
                             <h4
-                              className={`font-bold text-base ${
-                                selectedLocation === location.name
-                                  ? "text-orange-600"
-                                  : "text-gray-900"
-                              }`}
+                              className={`font-bold text-base ${selectedLocation === location.name
+                                ? "text-orange-600"
+                                : "text-gray-900"
+                                }`}
                             >
                               {location.name}
                             </h4>
@@ -304,27 +295,30 @@ const Navbar = () => {
         </div>
 
         {/* Notification Icon */}
-        <Link
-          to="/notifications"
-          className="relative p-2 rounded-full hover:bg-orange-50 transition-all duration-300 cursor-pointer hover:scale-110 group"
-        >
-          <FaBell
-            size={20}
-            className="text-gray-700 group-hover:text-orange-600 transition-colors duration-300 group-hover:animate-[swing_0.6s_ease-in-out]"
-          />
-          {unreadCount > 0 && (
-            <div className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-lg animate-pulse">
-              {unreadCount}
-            </div>
-          )}
-        </Link>
+        {user ? (
+          <Link
+            to="/notifications"
+            className="relative p-2 rounded-full hover:bg-orange-50 transition-all duration-300 cursor-pointer hover:scale-110 group"
+          >
+            <FaBell
+              size={20}
+              className="text-gray-700 group-hover:text-orange-600 transition-colors duration-300 group-hover:animate-[swing_0.6s_ease-in-out]"
+            />
+            {unreadCount > 0 && (
+              <div className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-lg animate-pulse">
+                {unreadCount}
+              </div>
+            )}
+          </Link>
+        ) : (
+          <div className="w-9 h-9" />
+        )}
       </header>
 
       {/* Desktop/Tablet Header (visible on tablet and desktop) - Smooth Hide/Show */}
       <header
-        className={`hidden lg:block fixed top-0 left-0 right-0 z-50 w-full bg-white transition-all duration-500 ease-in-out ${
-          visible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
-        } ${isScrolled ? "shadow-lg" : "shadow-md"}`}
+        className={`hidden lg:block fixed top-0 left-0 right-0 z-50 w-full bg-white transition-all duration-500 ease-in-out ${visible ? "translate-y-0 opacity-100" : "-translate-y-full opacity-0"
+          } ${isScrolled ? "shadow-lg" : "shadow-md"}`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-20">
@@ -383,28 +377,25 @@ const Navbar = () => {
                         <button
                           key={location.id}
                           onClick={() => handleLocationSelect(location.name)}
-                          className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 hover:bg-orange-50 group ${
-                            selectedLocation === location.name
-                              ? "bg-orange-50"
-                              : ""
-                          }`}
+                          className={`w-full text-left px-4 py-3 rounded-lg transition-all duration-200 hover:bg-orange-50 group ${selectedLocation === location.name
+                            ? "bg-orange-50"
+                            : ""
+                            }`}
                         >
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex items-start gap-3 flex-1">
                               <FaMapMarkerAlt
-                                className={`text-xl mt-0.5 transition-colors duration-200 ${
-                                  selectedLocation === location.name
-                                    ? "text-orange-600"
-                                    : "text-gray-400 group-hover:text-orange-600"
-                                }`}
+                                className={`text-xl mt-0.5 transition-colors duration-200 ${selectedLocation === location.name
+                                  ? "text-orange-600"
+                                  : "text-gray-400 group-hover:text-orange-600"
+                                  }`}
                               />
                               <div className="flex-1">
                                 <div
-                                  className={`font-semibold text-base mb-1 ${
-                                    selectedLocation === location.name
-                                      ? "text-orange-600"
-                                      : "text-gray-900"
-                                  }`}
+                                  className={`font-semibold text-base mb-1 ${selectedLocation === location.name
+                                    ? "text-orange-600"
+                                    : "text-gray-900"
+                                    }`}
                                 >
                                   {location.name}
                                 </div>
@@ -425,87 +416,89 @@ const Navbar = () => {
               </div>
 
               {/* Notification */}
-              <div
-                className="relative"
-                onMouseEnter={() => {
-                  if (unreadCount > 0) {
-                    clearTimeout(notifTimeoutRef.current);
-                    setShowNotifDropdown(true);
-                  }
-                }}
-                onMouseLeave={() => {
-                  notifTimeoutRef.current = setTimeout(() => {
-                    setShowNotifDropdown(false);
-                  }, 300);
-                }}
-              >
-                <Link
-                  to="/notifications"
-                  className="relative p-2 rounded-full hover:bg-orange-50 transition-all duration-300 group block"
+              {user && (
+                <div
+                  className="relative"
+                  onMouseEnter={() => {
+                    if (unreadCount > 0) {
+                      clearTimeout(notifTimeoutRef.current);
+                      setShowNotifDropdown(true);
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    notifTimeoutRef.current = setTimeout(() => {
+                      setShowNotifDropdown(false);
+                    }, 300);
+                  }}
                 >
-                  <FaBell
-                    size={20}
-                    className="text-gray-700 group-hover:text-orange-600 transition-colors duration-300"
-                  />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-lg animate-pulse">
-                      {unreadCount}
-                    </span>
-                  )}
-                </Link>
-
-                {/* Desktop Notification Dropdown */}
-                {showNotifDropdown && unreadCount > 0 && (
-                  <div className="absolute top-full mt-2 right-0 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[100] animate-[slideDown_0.3s_ease-out]">
-                    <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-orange-50/30">
-                      <h3 className="font-bold text-gray-900">New Alerts</h3>
-                      <span className="bg-orange-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">
+                  <Link
+                    to="/notifications"
+                    className="relative p-2 rounded-full hover:bg-orange-50 transition-all duration-300 group block"
+                  >
+                    <FaBell
+                      size={20}
+                      className="text-gray-700 group-hover:text-orange-600 transition-colors duration-300"
+                    />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 bg-gradient-to-r from-red-500 to-pink-500 text-white text-[10px] font-bold h-5 w-5 flex items-center justify-center rounded-full shadow-lg animate-pulse">
                         {unreadCount}
                       </span>
-                    </div>
-                    <div className="max-h-[350px] overflow-y-auto">
-                      {notifications
-                        .filter((n) => !n.readBy.includes(user.id || user._id))
-                        .slice(0, 5)
-                        .map((notif) => (
-                          <div
-                            key={notif._id}
-                            onClick={() => {
-                              markNotificationAsRead(notif._id);
-                              navigate(`/notifications?id=${notif._id}`);
-                              setShowNotifDropdown(false);
-                            }}
-                            className="p-4 hover:bg-orange-50/50 border-b border-gray-50 transition-colors cursor-pointer group/item"
-                          >
-                            <div className="flex gap-3">
-                              <div className="shrink-0 mt-1">
-                                <NotificationIcon type={notif.type} />
-                              </div>
-                              <div className="flex-1 min-w-0">
-                                <h4 className="text-sm font-bold text-gray-900 group-hover/item:text-orange-600 transition-colors line-clamp-1">
-                                  {notif.title}
-                                </h4>
-                                <p className="text-xs text-gray-500 line-clamp-2 mt-0.5">
-                                  {notif.message}
-                                </p>
-                                <span className="text-[10px] text-gray-400 mt-2 block font-medium">
-                                  Just now
-                                </span>
+                    )}
+                  </Link>
+
+                  {/* Desktop Notification Dropdown */}
+                  {showNotifDropdown && unreadCount > 0 && (
+                    <div className="absolute top-full mt-2 right-0 w-80 bg-white rounded-2xl shadow-2xl border border-gray-100 overflow-hidden z-[100] animate-[slideDown_0.3s_ease-out]">
+                      <div className="p-4 border-b border-gray-50 flex items-center justify-between bg-orange-50/30">
+                        <h3 className="font-bold text-gray-900">New Alerts</h3>
+                        <span className="bg-orange-600 text-white text-[10px] px-2 py-0.5 rounded-full font-bold">
+                          {unreadCount}
+                        </span>
+                      </div>
+                      <div className="max-h-[350px] overflow-y-auto">
+                        {notifications
+                          .filter((n) => !n.readBy.includes(user.id || user._id))
+                          .slice(0, 5)
+                          .map((notif) => (
+                            <div
+                              key={notif._id}
+                              onClick={() => {
+                                markNotificationAsRead(notif._id);
+                                navigate(`/notifications?id=${notif._id}`);
+                                setShowNotifDropdown(false);
+                              }}
+                              className="p-4 hover:bg-orange-50/50 border-b border-gray-50 transition-colors cursor-pointer group/item"
+                            >
+                              <div className="flex gap-3">
+                                <div className="shrink-0 mt-1">
+                                  <NotificationIcon type={notif.type} />
+                                </div>
+                                <div className="flex-1 min-w-0">
+                                  <h4 className="text-sm font-bold text-gray-900 group-hover/item:text-orange-600 transition-colors line-clamp-1">
+                                    {notif.title}
+                                  </h4>
+                                  <p className="text-xs text-gray-500 line-clamp-2 mt-0.5">
+                                    {notif.message}
+                                  </p>
+                                  <span className="text-[10px] text-gray-400 mt-2 block font-medium">
+                                    Just now
+                                  </span>
+                                </div>
                               </div>
                             </div>
-                          </div>
-                        ))}
+                          ))}
+                      </div>
+                      <Link
+                        to="/notifications"
+                        onClick={() => setShowNotifDropdown(false)}
+                        className="block text-center py-3 bg-gray-50 text-orange-600 text-xs font-bold hover:bg-orange-100 transition-colors"
+                      >
+                        View All Notifications
+                      </Link>
                     </div>
-                    <Link
-                      to="/notifications"
-                      onClick={() => setShowNotifDropdown(false)}
-                      className="block text-center py-3 bg-gray-50 text-orange-600 text-xs font-bold hover:bg-orange-100 transition-colors"
-                    >
-                      View All Notifications
-                    </Link>
-                  </div>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
 
               {/* Auth Button */}
               {user ? (
@@ -534,26 +527,23 @@ const Navbar = () => {
 
       {/* Mobile Sidebar Menu */}
       <div
-        className={`lg:hidden fixed top-0 left-0 h-screen w-full z-[55] transition-all duration-500 ${
-          menubar
-            ? "opacity-100 pointer-events-auto"
-            : "opacity-0 pointer-events-none"
-        }`}
+        className={`lg:hidden fixed top-0 left-0 h-screen w-full z-[55] transition-all duration-500 ${menubar
+          ? "opacity-100 pointer-events-auto"
+          : "opacity-0 pointer-events-none"
+          }`}
       >
         <div className="min-h-screen flex items-start">
           {/* Backdrop */}
           <div
-            className={`fixed w-full inset-0 bg-black/30 backdrop-blur-sm transition-all duration-500 ${
-              menubar ? "opacity-100" : "opacity-0"
-            }`}
+            className={`fixed w-full inset-0 bg-black/30 backdrop-blur-sm transition-all duration-500 ${menubar ? "opacity-100" : "opacity-0"
+              }`}
             onClick={menubarmenu}
           ></div>
 
           {/* Sidebar Panel */}
           <aside
-            className={`relative z-10 w-72 bg-white h-screen shadow-2xl p-6 transform transition-all duration-500 ease-out ${
-              menubar ? "translate-x-0" : "-translate-x-full"
-            }`}
+            className={`relative z-10 w-72 bg-white h-screen shadow-2xl p-6 transform transition-all duration-500 ease-out ${menubar ? "translate-x-0" : "-translate-x-full"
+              }`}
           >
             {/* Header with Logo */}
             <div className="flex items-start justify-between mb-8">
@@ -633,21 +623,23 @@ const Navbar = () => {
                 <span className="text-sm">Contact Us</span>
               </NavLink>
 
-              <NavLink
-                to="/notifications"
-                className={navLinkClassesMobile}
-                onClick={menubarmenu}
-              >
-                <div className="relative">
-                  <FaBell size={18} className="shrink-0" />
-                  {unreadCount > 0 && (
-                    <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
-                      {unreadCount}
-                    </span>
-                  )}
-                </div>
-                <span className="text-sm">Notifications</span>
-              </NavLink>
+              {user && (
+                <NavLink
+                  to="/notifications"
+                  className={navLinkClassesMobile}
+                  onClick={menubarmenu}
+                >
+                  <div className="relative">
+                    <FaBell size={18} className="shrink-0" />
+                    {unreadCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[9px] font-bold h-4 w-4 flex items-center justify-center rounded-full">
+                        {unreadCount}
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-sm">Notifications</span>
+                </NavLink>
+              )}
             </nav>
 
             {/* Divider */}

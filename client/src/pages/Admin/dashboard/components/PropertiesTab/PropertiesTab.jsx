@@ -200,26 +200,23 @@ const PropertiesTab = ({
                           onClick={() =>
                             handleToggleStatus(property._id, property.status)
                           }
-                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                            property.status === "active"
-                              ? "bg-green-600"
-                              : "bg-gray-300"
-                          }`}
+                          className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${property.status === "active"
+                            ? "bg-green-600"
+                            : "bg-gray-300"
+                            }`}
                         >
                           <span
-                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                              property.status === "active"
-                                ? "translate-x-6"
-                                : "translate-x-1"
-                            }`}
+                            className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${property.status === "active"
+                              ? "translate-x-6"
+                              : "translate-x-1"
+                              }`}
                           />
                         </button>
                         <span
-                          className={`text-xs font-semibold uppercase inline-block w-16 ${
-                            property.status === "active"
-                              ? "text-green-700"
-                              : "text-gray-500"
-                          }`}
+                          className={`text-xs font-semibold uppercase inline-block w-16 ${property.status === "active"
+                            ? "text-green-700"
+                            : "text-gray-500"
+                            }`}
                         >
                           {property.status === "active" ? "Active" : "Inactive"}
                         </span>
@@ -230,12 +227,14 @@ const PropertiesTab = ({
                     </td> */}
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
-                        <button
-                          onClick={() => navigate(`/property/${property._id}`)}
-                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-blue-100"
+                        <a
+                          href={`/property/${property._id}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors border border-blue-100 inline-flex items-center justify-center"
                         >
                           <FaEye />
-                        </button>
+                        </a>
                         <button
                           onClick={() =>
                             navigate(`/admin/edit-property/${property._id}`)
