@@ -11,6 +11,7 @@ import SEO from "../../components/SEO";
 import Popup from "../../components/Popup";
 
 const Contact = () => {
+
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -115,7 +116,7 @@ const Contact = () => {
       />
       <div className="bg-gray-50 text-gray-800 antialiased"></div>
       <section className="relative">
-        <div className="w-full h-56 sm:h-72 md:h-96 lg:h-[360px] overflow-hidden relative md:mt-20">
+        {/* <div className="w-full h-56 sm:h-72 md:h-96 lg:h-[260px] overflow-hidden relative md:mt-20">
           <img
             src="https://images.unsplash.com/photo-1552581234-26160f608093?q=80&w=1200&auto=format&fit=crop"
             alt="hero"
@@ -124,99 +125,17 @@ const Contact = () => {
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center px-4">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white">
-                Contact
+                Contact Us
               </h1>
             </div>
           </div>
-        </div>
+        </div> */}
         <main className="relative mt-10 max-w-7xl mx-auto -mt-12 px-4 sm:px-6 lg:px-8 ">
-          <div className=" relative flex justify-center">
-            <span className="bg-white rounded-full px-4 py-1 text-xs text-gray-600 shadow-lg">
-              CONTACT INFO
-            </span>
-          </div>
 
-          <div className="text-center mt-4">
-            <h2 className="text-3xl sm:text-4xl font-bold text-orange-600">
-              Contact & <span className="text-gray-800">Join Together</span>
-            </h2>
-            <p className="mt-3 text-gray-600 max-w-2xl mx-auto">
-              At Globes Properties, we unite builders, buyers, sellers, and
-              investors across Bangalore real estate.
-            </p>
-          </div>
-
-          {/* <!-- info cards --> */}
-          <section className="mt-8 grid grid-cols-1 gap-0 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
-            <div className="bg-gray-100 rounded-2xl p-5 shadow-xl">
-              <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-lg bg-orange-600/10 flex items-center justify-center">
-                  {/* <!-- location icon --> */}
-                  <FaMapMarkerAlt size={18} className="text-orange-600" />
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500">Location</div>
-                  <div className="font-semibold">Visit Us At</div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    Kalyan Nagar, Bangalore — 560043
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-100 rounded-2xl p-5 shadow-xl">
-              <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-lg bg-orange-600/10 flex items-center justify-center">
-                  <FaPhoneAlt size={20} className="text-orange-600" />
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500">24/7 Service</div>
-                  <div className="font-semibold">Call Us On</div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    +91 99457 39702
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-100 rounded-2xl p-5 shadow-xl">
-              <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-lg bg-orange-600/10 flex items-center justify-center">
-                  <FaEnvelope size={18} className="text-orange-600" />
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500">Drop A Line</div>
-                  <div className="font-semibold">Mail Address</div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    support@globesproperties.com
-                    <br />
-                    contact@globesproperties.com
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-gray-100 rounded-2xl p-5 shadow-xl">
-              <div className="flex items-start gap-3">
-                <div className="w-11 h-11 rounded-lg bg-orange-600/10 flex items-center justify-center">
-                  <FaClock size={18} className="text-orange-600" />
-                </div>
-                <div>
-                  <div className="text-xs text-gray-500">Office Hours</div>
-                  <div className="font-semibold">Opening Time</div>
-                  <div className="text-sm text-gray-500 mt-1">
-                    Mon - Sat : 10am - 6:30pm
-                    <br />
-                    Sunday (Closed)
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
 
           {/* <!-- big section: agent image left + form right --> */}
           <section
-            className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center "
+            className="mt-6 lg:mt-20 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center "
             id="contact"
           >
             {/* <div className="lg:col-span-5 flex justify-center lg:justify-end">
@@ -229,13 +148,13 @@ const Contact = () => {
               </div>
             </div> */}
 
-            <div className="lg:col-span-8 lg:col-start-3">
-              <div className="bg-white rounded-2xl p-8 shadow-card w-full">
+            <div className="lg:col-span-8 lg:col-start-3 lg:mt-20">
+              <div className="bg-white rounded-[32px] p-6 sm:p-10 border border-orange-100 shadow-[0_20px_50px_rgba(0,0,0,0.18)] w-full animate-[fadeInUp_0.8s_ease-out]">
                 <div className="flex flex-col items-center text-center justify-between">
                   <div>
                     <div className="text-xs text-gray-500">CONTACT US</div>
                     <h3 className="text-2xl sm:text-3xl font-bold mt-1">
-                      Reach & Get In Touch With Us!
+                      Get In Touch With Us!
                     </h3>
                   </div>
                   <div className="hidden sm:block text-sm text-gray-500">
@@ -342,7 +261,7 @@ const Contact = () => {
                       )}
                       {showOtpField
                         ? "Verify & Submit"
-                        : "Send Verification OTP"}
+                        : "Submit"}
                     </button>
                     {showOtpField && (
                       <button
@@ -374,8 +293,100 @@ const Contact = () => {
             </div>
           </section>
 
+
+
+
+
+          {/* <div className=" relative flex justify-center mt-24">
+            <span className="bg-white rounded-full px-4 py-1 text-xs text-gray-600 shadow-lg">
+              CONTACT INFO
+            </span>
+          </div>
+
+          <div className="text-center mt-4">
+            <h2 className="text-3xl sm:text-4xl font-bold text-orange-600">
+              Contact & <span className="text-gray-800">Join Together</span>
+            </h2>
+            <p className="mt-3 text-gray-600 max-w-2xl mx-auto">
+              At Globes Properties, we unite builders, buyers, sellers, and
+              investors across Bangalore real estate.
+            </p>
+          </div> */}
+
+
+
+
+
+          {/* <!-- info cards --> */}
+          <section className="mt-24 grid grid-cols-1 gap-0 sm:grid-cols-2 lg:grid-cols-4 md:gap-6">
+            <div className="bg-gray-100 rounded-2xl p-5 shadow-xl">
+              <div className="flex items-start gap-3">
+                <div className="w-11 h-11 rounded-lg bg-orange-600/10 flex items-center justify-center">
+                  {/* <!-- location icon --> */}
+                  <FaMapMarkerAlt size={18} className="text-orange-600" />
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Location</div>
+                  <div className="font-semibold">Visit Us At</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    Kalyan Nagar, Bangalore — 560043
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-100 rounded-2xl p-5 shadow-xl">
+              <div className="flex items-start gap-3">
+                <div className="w-11 h-11 rounded-lg bg-orange-600/10 flex items-center justify-center">
+                  <FaPhoneAlt size={20} className="text-orange-600" />
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">24/7 Service</div>
+                  <div className="font-semibold">Call Us On</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    +91 99457 39702
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-100 rounded-2xl p-5 shadow-xl">
+              <div className="flex items-start gap-3">
+                <div className="w-11 h-11 rounded-lg bg-orange-600/10 flex items-center justify-center">
+                  <FaEnvelope size={18} className="text-orange-600" />
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Drop A Line</div>
+                  <div className="font-semibold">Mail Address</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    support@globesproperties.com
+                    <br />
+                    contact@globesproperties.com
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-gray-100 rounded-2xl p-5 shadow-xl">
+              <div className="flex items-start gap-3">
+                <div className="w-11 h-11 rounded-lg bg-orange-600/10 flex items-center justify-center">
+                  <FaClock size={18} className="text-orange-600" />
+                </div>
+                <div>
+                  <div className="text-xs text-gray-500">Office Hours</div>
+                  <div className="font-semibold">Opening Time</div>
+                  <div className="text-sm text-gray-500 mt-1">
+                    Mon - Sun : 10am - 6:30pm
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+
+
           {/* <!-- map strip: embedded google maps (replace coordinates if needed) --> */}
-          <section className="mt-12 mb-16">
+          <section className="mt-24 mb-16">
             <div className="rounded-xl overflow-hidden">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d19849.44138692748!2d77.5951155!3d12.9923411!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bae1666c5b3b0b1%3A0xf7fb0a6c1e9f2c4f!2sKalyan%20Nagar%2C%20Bengaluru%2C%20Karnataka!5e0!3m2!1sen!2sin!4v1692860000000!5m2!1sen!2sin"
@@ -415,5 +426,6 @@ const Contact = () => {
     </>
   );
 };
+
 
 export default Contact;

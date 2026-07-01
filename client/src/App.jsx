@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import MainLayout from "./layouts/Main Layout/mainLayout";
 import Home from "./pages/Home/Home";
 import Blogs from "./pages/Blogs/Blogs";
@@ -29,10 +29,21 @@ import BlogEditor from "./pages/Admin/dashboard/components/BlogsTab/BlogEditor";
 
 import { AuthProvider } from "./context/AuthContext";
 
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 function App() {
   return (
     <AuthProvider>
       <BrowserRouter>
+        <ScrollToTop />
         <Routes>
           {/* Admin Routes (No MainLayout/Website Navbar) */}
           <Route path="/admin/login" element={<AdminLogin />} />

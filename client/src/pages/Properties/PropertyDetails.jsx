@@ -108,6 +108,16 @@ const PropertyDetails = () => {
     title: "",
     message: "",
   });
+  const [popup, setPopup] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+  });
+
+  const showPopup = (type, title, message) => {
+    setPopup({ isOpen: true, type, title, message });
+  };
   const [meetingData, setMeetingData] = useState({
     name: "",
     email: "",
@@ -157,6 +167,9 @@ const PropertyDetails = () => {
 
   // Carousel drag state
   const carouselRef = useRef(null);
+  const contactFormRef = useRef(null);
+  const sidebarRef = useRef(null);
+  const lastScrollY = useRef(0);
   const [isDragging, setIsDragging] = useState(false);
   const [startX, setStartX] = useState(0);
   const [dragOffset, setDragOffset] = useState(0);
@@ -316,11 +329,53 @@ const PropertyDetails = () => {
     setDragOffset(0);
   };
 
-  // --- OTP & Bot Protection States ---
+  // OTP & Bot Protection States
   const [showOtpField, setShowOtpField] = useState(false);
   const [otp, setOtp] = useState("");
   const [isVerifying, setIsVerifying] = useState(false);
   const [botField, setBotField] = useState(""); // Honeypot field
+
+  // Dynamic sticky sidebar effect for tall content
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!sidebarRef.current) return;
+      const sidebar = sidebarRef.current;
+      const sidebarHeight = sidebar.offsetHeight;
+      const viewportHeight = window.innerHeight;
+      const currentScrollY = window.scrollY;
+
+      // Header offset (e.g. 96px for desktop navbar)
+      const topOffset = 96;
+
+      if (sidebarHeight + topOffset + 24 <= viewportHeight) {
+        sidebar.style.position = "sticky";
+        sidebar.style.top = `${topOffset}px`;
+        return;
+      }
+
+      sidebar.style.position = "sticky";
+      if (currentScrollY > lastScrollY.current) {
+        // Scrolling Down: stick to the bottom
+        sidebar.style.top = `${viewportHeight - sidebarHeight - 24}px`;
+      } else {
+        // Scrolling Up: stick to the top
+        sidebar.style.top = `${topOffset}px`;
+      }
+
+      lastScrollY.current = currentScrollY;
+    };
+
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("resize", handleScroll, { passive: true });
+    // Run once after render to set initial state
+    const timer = setTimeout(handleScroll, 100);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("resize", handleScroll);
+      clearTimeout(timer);
+    };
+  }, [property]); // Re-calculate when property details load or change
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -335,15 +390,15 @@ const PropertyDetails = () => {
 
     if (!showOtpField) {
       if (!nameRegex.test(formData.name)) {
-        alert("Kripya sahi naam bharein.");
+        showPopup("warning", "Invalid Name", "Kripya sahi naam bharein.");
         return;
       }
       if (!emailRegex.test(formData.email)) {
-        alert("Kripya valid email bharein.");
+        showPopup("warning", "Invalid Email", "Kripya valid email bharein.");
         return;
       }
       if (!phoneRegex.test(formData.phone)) {
-        alert("Kripya 10-digit mobile number bharein (6-9 se shuru).");
+        showPopup("warning", "Invalid Phone", "Kripya 10-digit mobile number bharein (6-9 se shuru).");
         return;
       }
     }
@@ -364,9 +419,9 @@ const PropertyDetails = () => {
         const data = await res.json();
         if (data.success) {
           setShowOtpField(true);
-          alert("OTP Sent");
+          showPopup("success", "OTP Sent", "Validation code sent to your mobile number");
         } else {
-          alert(data.message || "OTP bhejne mein samasya hui.");
+          showPopup("error", "Error", data.message || "OTP bhejne mein samasya hui.");
         }
       } else {
         // STEP 2: Verify OTP and Submit
@@ -380,16 +435,16 @@ const PropertyDetails = () => {
         );
         const data = await res.json();
         if (data.success) {
-          alert("Thank you! Your inquiry has been submitted successfully.");
+          showPopup("success", "Success", "Thank you! Your inquiry has been submitted successfully.");
           setFormData({ name: "", email: "", phone: "", message: "" });
           setOtp("");
           setShowOtpField(false);
         } else {
-          alert(data.message || "Galat OTP!");
+          showPopup("error", "Verification Failed", data.message || "Galat OTP!");
         }
       }
     } catch (err) {
-      alert("Server error. Kripya check karein ki backend chal raha hai.");
+      showPopup("error", "Server Error", "Server error. Kripya check karein ki backend chal raha hai.");
     } finally {
       setIsVerifying(false);
     }
@@ -449,6 +504,14 @@ const PropertyDetails = () => {
     );
   }
 
+  const priceStr = String(selectedPlan?.price || "").trim().toLowerCase();
+  const isPriceAvailable =
+    priceStr &&
+    priceStr !== "n/a" &&
+    priceStr !== "ask price" &&
+    priceStr !== "contact for price" &&
+    priceStr !== "for price";
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50/20 to-gray-50 pt-4 md:pt-24 pb-12">
       <SEO
@@ -506,26 +569,25 @@ const PropertyDetails = () => {
             <div className="text-left md:text-right">
               <div className="flex items-baseline gap-2 justify-start md:justify-end">
                 <span className="text-xl md:text-xl font-extrabold text-gray-900 whitespace-nowrap">
-                  {selectedPlan?.price && selectedPlan.price !== "N/A" && selectedPlan.price !== "Ask Price" && selectedPlan.price !== "Contact for Price"
-                    ? `₹${selectedPlan.price}`
-                    : "Contact for Price"}
+                  {isPriceAvailable ? `₹${selectedPlan.price}` : "For Price"}
                 </span>
-                {selectedPlan?.pricePerSqft && selectedPlan.pricePerSqft !== "N/A" && (
+                {isPriceAvailable && selectedPlan?.pricePerSqft && selectedPlan.pricePerSqft !== "N/A" && (
                   <span className="text-gray-400 text-[10px] md:text-xs font-medium border-l border-gray-300 pl-2">
                     ₹{selectedPlan.pricePerSqft}/sq.ft
                   </span>
                 )}
               </div>
               <p className="text-orange-600 text-xs md:text-xs font-bold mt-0.5">
-                {selectedPlan?.emi ? `EMI starts at ₹${selectedPlan.emi}` : ""}
+                {isPriceAvailable && selectedPlan?.emi ? `EMI starts at ₹${selectedPlan.emi}` : ""}
               </p>
             </div>
 
             <button
-              onClick={() => setShowContactForm(true)}
+              // onClick={() => navigate("/contact", { state: { scrollTo: "contact" } })}
+              onClick={() => navigate("/contact")}
               className="w-full md:w-auto px-4 py-2 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg md:rounded-lg font-bold text-xs md:text-xs shadow-lg hover:shadow-orange-200 md:hover:-translate-y-0.5 transition-all duration-300 active:scale-95"
             >
-              Contact Developer
+              Connect With Us
             </button>
           </div>
         </div>
@@ -690,26 +752,25 @@ const PropertyDetails = () => {
             <div className="text-left">
               <div className="flex items-baseline gap-2">
                 <span className="text-xl font-extrabold text-gray-900 whitespace-nowrap">
-                  {selectedPlan?.price && selectedPlan.price !== "N/A" && selectedPlan.price !== "Ask Price" && selectedPlan.price !== "Contact for Price"
-                    ? `₹${selectedPlan.price}`
-                    : "Contact for Price"}
+                  {isPriceAvailable ? `₹${selectedPlan.price}` : "For Price"}
                 </span>
-                {selectedPlan?.pricePerSqft && selectedPlan.pricePerSqft !== "N/A" && (
+                {isPriceAvailable && selectedPlan?.pricePerSqft && selectedPlan.pricePerSqft !== "N/A" && (
                   <span className="text-gray-400 text-[10px] font-medium border-l border-gray-300 pl-2">
                     ₹{selectedPlan.pricePerSqft}/sq.ft
                   </span>
                 )}
               </div>
               <p className="text-orange-600 text-xs font-bold mt-0.5">
-                {selectedPlan?.emi ? `EMI starts at ₹${selectedPlan.emi}` : ""}
+                {isPriceAvailable && selectedPlan?.emi ? `EMI starts at ₹${selectedPlan.emi}` : ""}
               </p>
             </div>
 
             <button
-              onClick={() => setShowContactForm(true)}
+              // onClick={() => navigate("/contact", { state: { scrollTo: "contact" } })}
+              onClick={() => navigate("/contact")}
               className="w-full px-5 py-2.5 bg-gradient-to-r from-orange-600 to-orange-700 text-white rounded-lg font-bold text-xs shadow-lg hover:shadow-orange-200 active:scale-95 md:hover:scale-105 transition-all duration-300"
             >
-              Contact Developer
+              Connect With Us
             </button>
           </div>
         </div>
@@ -1248,7 +1309,7 @@ const PropertyDetails = () => {
 
           {/* Sidebar */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 space-y-6">
+            <div ref={sidebarRef} className="space-y-6">
               {/* Contact Agent Card */}
               <div className="bg-white rounded-xl md:rounded-2xl shadow-lg p-5 md:p-6 animate-[fadeInUp_0.6s_ease-out]">
                 <h3 className="text-lg md:text-xl font-bold text-gray-900 mb-4">
@@ -1426,7 +1487,7 @@ const PropertyDetails = () => {
                       )}
                       {showOtpField
                         ? "Verify & Submit"
-                        : "Send Verification OTP"}
+                        : "Submit"}
                     </button>
                     {showOtpField && (
                       <button
@@ -1628,6 +1689,13 @@ const PropertyDetails = () => {
         type={visitPopupData.type}
         title={visitPopupData.title}
         message={visitPopupData.message}
+      />
+      <Popup
+        isOpen={popup.isOpen}
+        onClose={() => setPopup({ ...popup, isOpen: false })}
+        type={popup.type}
+        title={popup.title}
+        message={popup.message}
       />
     </div>
   );

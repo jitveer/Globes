@@ -238,7 +238,7 @@ async function seedDatabase() {
         ],
         agent: {
           name: "Agent Name",
-          phone: "+91 9876543210",
+          phone: "+91 99457 39702",
           email: "agent@example.com",
           image: "https://i.pravatar.cc/150?img=10",
         },

@@ -311,7 +311,7 @@ const AddEditProperty = () => {
   // Default agent configuration
   const DEFAULT_AGENT = {
     name: "Globes Properties Team",
-    phone: "+91 98765 43210",
+    phone: "9945739702",
     email: "contact@globesproperties.com",
     image:
       "https://ui-avatars.com/api/?name=Globes+Properties&background=f97316&color=fff",
