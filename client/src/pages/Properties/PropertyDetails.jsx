@@ -108,6 +108,9 @@ const PropertyDetails = () => {
     title: "",
     message: "",
   });
+  const [showVisitOtpField, setShowVisitOtpField] = useState(false);
+  const [visitOtp, setVisitOtp] = useState("");
+  const [isVerifyingVisit, setIsVerifyingVisit] = useState(false);
   const [popup, setPopup] = useState({
     isOpen: false,
     type: "success",
@@ -447,6 +450,158 @@ const PropertyDetails = () => {
       showPopup("error", "Server Error", "Server error. Kripya check karein ki backend chal raha hai.");
     } finally {
       setIsVerifying(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    try {
+      showPopup("success", "Sending...", "Resending OTP to your mobile number");
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/otp/resend`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ recipient: formData.phone }),
+        },
+      );
+      const data = await res.json();
+      if (data.success) {
+        showPopup("success", "OTP Resent", "A new validation code has been sent to your mobile number");
+      } else {
+        showPopup("error", "Error", data.message || "Failed to resend OTP.");
+      }
+    } catch (err) {
+      showPopup("error", "Server Error", "Server error. Please try again.");
+    }
+  };
+
+  const handleVisitSubmit = async (e) => {
+    e.preventDefault();
+    setIsVerifyingVisit(true);
+
+    try {
+      if (!showVisitOtpField) {
+        // Send OTP
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/v1/otp/send`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ recipient: meetingData.phone, type: "sms" }),
+          },
+        );
+        const data = await res.json();
+        if (data.success) {
+          setShowVisitOtpField(true);
+          setVisitPopupData({
+            isOpen: true,
+            type: "success",
+            title: "OTP Sent",
+            message: "Validation code sent to your mobile number",
+          });
+        } else {
+          setVisitPopupData({
+            isOpen: true,
+            type: "error",
+            title: "Error",
+            message: data.message || "Something went wrong.",
+          });
+        }
+      } else {
+        // Verify OTP
+        const verifyRes = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/v1/otp/verify`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ recipient: meetingData.phone, otp: visitOtp }),
+          },
+        );
+        const verifyData = await verifyRes.json();
+        if (!verifyData.success) {
+          setVisitPopupData({
+            isOpen: true,
+            type: "error",
+            title: "Verification Failed",
+            message: verifyData.message || "Invalid OTP!",
+          });
+          setIsVerifyingVisit(false);
+          return;
+        }
+
+        // Submit Schedule Visit
+        setIsSubmittingVisit(true);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_BASE_URL}/api/v1/schedule-visit`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              ...meetingData,
+              message: meetingData.message + ` (Property: ${property.title})`,
+            }),
+          },
+        );
+        const data = await res.json();
+        if (data.success) {
+          setIsVisitModalOpen(false);
+          setMeetingData({
+            name: "",
+            email: "",
+            phone: "",
+            date: "",
+            time: "",
+            message: "",
+          });
+          setVisitOtp("");
+          setShowVisitOtpField(false);
+          setVisitPopupData({
+            isOpen: true,
+            type: "success",
+            title: "Visit Scheduled!",
+            message: "We'll contact you soon to confirm.",
+          });
+        } else {
+          setVisitPopupData({
+            isOpen: true,
+            type: "error",
+            title: "Booking Failed",
+            message: data.message || "Try again.",
+          });
+        }
+        setIsSubmittingVisit(false);
+      }
+    } catch (err) {
+      setVisitPopupData({
+        isOpen: true,
+        type: "error",
+        title: "Server Error",
+        message: "Server issue, please try later.",
+      });
+    } finally {
+      setIsVerifyingVisit(false);
+    }
+  };
+
+  const handleVisitResendOtp = async () => {
+    try {
+      setVisitPopupData({ isOpen: true, type: "success", title: "Sending...", message: "Resending OTP..." });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/otp/resend`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ recipient: meetingData.phone }),
+        },
+      );
+      const data = await res.json();
+      if (data.success) {
+        setVisitPopupData({ isOpen: true, type: "success", title: "OTP Resent", message: "A new validation code has been sent." });
+      } else {
+        setVisitPopupData({ isOpen: true, type: "error", title: "Error", message: data.message || "Failed to resend OTP." });
+      }
+    } catch (err) {
+      setVisitPopupData({ isOpen: true, type: "error", title: "Server Error", message: "Server error. Please try again." });
     }
   };
 
@@ -1490,13 +1645,23 @@ const PropertyDetails = () => {
                         : "Submit"}
                     </button>
                     {showOtpField && (
-                      <button
-                        type="button"
-                        onClick={() => setShowOtpField(false)}
-                        className="text-[10px] font-bold text-gray-400 hover:text-orange-600 transition-colors uppercase tracking-wider"
-                      >
-                        Edit Information
-                      </button>
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setShowOtpField(false)}
+                          className="text-[10px] font-bold text-gray-400 hover:text-orange-600 transition-colors uppercase tracking-wider"
+                        >
+                          Edit Information
+                        </button>
+                        <span className="text-gray-300">|</span>
+                        <button
+                          type="button"
+                          onClick={handleResendOtp}
+                          className="text-[10px] font-bold text-gray-400 hover:text-orange-600 transition-colors uppercase tracking-wider"
+                        >
+                          Resend OTP
+                        </button>
+                      </div>
                     )}
                   </div>
                 </form>
@@ -1535,68 +1700,15 @@ const PropertyDetails = () => {
               </div>
 
               <form
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  setIsSubmittingVisit(true);
-
-                  try {
-                    const res = await fetch(
-                      `${import.meta.env.VITE_API_BASE_URL}/api/v1/schedule-visit`,
-                      {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({
-                          ...meetingData,
-                          message:
-                            meetingData.message +
-                            ` (Property: ${property.title})`,
-                        }),
-                      },
-                    );
-                    const data = await res.json();
-
-                    if (data.success) {
-                      setIsVisitModalOpen(false);
-                      setMeetingData({
-                        name: "",
-                        email: "",
-                        phone: "",
-                        date: "",
-                        time: "",
-                        message: "",
-                      });
-                      setVisitPopupData({
-                        isOpen: true,
-                        type: "success",
-                        title: "Visit Scheduled!",
-                        message: "We'll contact you soon to confirm.",
-                      });
-                    } else {
-                      setVisitPopupData({
-                        isOpen: true,
-                        type: "error",
-                        title: "Booking Failed",
-                        message: data.message || "Try again.",
-                      });
-                    }
-                  } catch (err) {
-                    setVisitPopupData({
-                      isOpen: true,
-                      type: "error",
-                      title: "Server Error",
-                      message: "Server issue, please try later.",
-                    });
-                  } finally {
-                    setIsSubmittingVisit(false);
-                  }
-                }}
+                onSubmit={handleVisitSubmit}
                 className="space-y-3"
               >
                 <input
                   type="text"
                   required
+                  disabled={showVisitOtpField}
                   placeholder="Full Name"
-                  className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-sm font-medium"
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-sm font-medium disabled:bg-gray-100"
                   value={meetingData.name}
                   onChange={(e) =>
                     setMeetingData({ ...meetingData, name: e.target.value })
@@ -1605,9 +1717,10 @@ const PropertyDetails = () => {
                 <input
                   type="tel"
                   required
+                  disabled={showVisitOtpField}
                   maxLength="10"
                   placeholder="Phone Number"
-                  className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-sm font-medium"
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-sm font-medium disabled:bg-gray-100"
                   value={meetingData.phone}
                   onChange={(e) =>
                     setMeetingData({
@@ -1619,63 +1732,110 @@ const PropertyDetails = () => {
                 <input
                   type="email"
                   required
+                  disabled={showVisitOtpField}
                   placeholder="Email Address"
-                  className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-sm font-medium"
+                  className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-sm font-medium disabled:bg-gray-100"
                   value={meetingData.email}
                   onChange={(e) =>
                     setMeetingData({ ...meetingData, email: e.target.value })
                   }
                 />
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="relative">
-                    <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
-                    <input
-                      type="date"
-                      required
-                      min={new Date().toISOString().split("T")[0]}
-                      className="w-full pl-9 pr-3 py-3 bg-gray-50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-xs font-medium"
-                      value={meetingData.date}
-                      onChange={(e) =>
-                        setMeetingData({ ...meetingData, date: e.target.value })
-                      }
-                    />
-                  </div>
-                  <div className="relative">
-                    <FaClock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
-                    <input
-                      type="time"
-                      required
-                      className="w-full pl-9 pr-3 py-3 bg-gray-50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-xs font-medium"
-                      value={meetingData.time}
-                      onChange={(e) =>
-                        setMeetingData({ ...meetingData, time: e.target.value })
-                      }
-                    />
-                  </div>
-                </div>
-                <textarea
-                  placeholder="Message (Optional)"
-                  rows="2"
-                  className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-sm font-medium resize-none"
-                  value={meetingData.message}
-                  onChange={(e) =>
-                    setMeetingData({ ...meetingData, message: e.target.value })
-                  }
-                />
 
-                <button
-                  type="submit"
-                  disabled={isSubmittingVisit}
-                  className="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-sm shadow-lg shadow-orange-500/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
-                >
-                  {isSubmittingVisit ? (
-                    <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
-                  ) : (
-                    <>
-                      <FaPaperPlane /> Schedule Now
-                    </>
+                {!showVisitOtpField && (
+                  <>
+                    <div className="grid grid-cols-2 gap-3 animate-[fadeIn_0.3s_ease-out]">
+                      <div className="relative">
+                        <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
+                        <input
+                          type="date"
+                          required
+                          min={new Date().toISOString().split("T")[0]}
+                          className="w-full pl-9 pr-3 py-3 bg-gray-50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-xs font-medium"
+                          value={meetingData.date}
+                          onChange={(e) =>
+                            setMeetingData({ ...meetingData, date: e.target.value })
+                          }
+                        />
+                      </div>
+                      <div className="relative">
+                        <FaClock className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs" />
+                        <input
+                          type="time"
+                          required
+                          className="w-full pl-9 pr-3 py-3 bg-gray-50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-xs font-medium"
+                          value={meetingData.time}
+                          onChange={(e) =>
+                            setMeetingData({ ...meetingData, time: e.target.value })
+                          }
+                        />
+                      </div>
+                    </div>
+                    <textarea
+                      placeholder="Message (Optional)"
+                      rows="2"
+                      className="w-full px-4 py-3 bg-gray-50 border-2 border-transparent focus:border-orange-500 rounded-2xl outline-none text-sm font-medium resize-none animate-[fadeIn_0.3s_ease-out]"
+                      value={meetingData.message}
+                      onChange={(e) =>
+                        setMeetingData({ ...meetingData, message: e.target.value })
+                      }
+                    />
+                  </>
+                )}
+
+                {showVisitOtpField && (
+                  <div className="animate-[slideUp_0.4s_ease-out] bg-orange-50 p-4 border-2 border-orange-200 rounded-xl">
+                    <label className="block text-center text-[10px] font-bold text-orange-600 mb-2 uppercase tracking-widest">
+                      Mobile Verification OTP
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      maxLength="4"
+                      inputMode="numeric"
+                      value={visitOtp}
+                      onChange={(e) =>
+                        setVisitOtp(e.target.value.replace(/\D/g, ""))
+                      }
+                      placeholder="••••"
+                      className="w-full px-4 py-2 border-2 border-orange-500 rounded-lg focus:ring-4 focus:ring-orange-500/10 outline-none bg-white text-center text-2xl font-black tracking-[8px] placeholder:tracking-normal"
+                    />
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-3">
+                  <button
+                    type="submit"
+                    disabled={isVerifyingVisit || isSubmittingVisit}
+                    className="w-full bg-orange-500 text-white py-4 rounded-2xl font-black text-sm shadow-lg shadow-orange-500/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-2"
+                  >
+                    {isVerifyingVisit || isSubmittingVisit ? (
+                      <div className="w-5 h-5 border-3 border-white border-t-transparent rounded-full animate-spin"></div>
+                    ) : (
+                      <>
+                        <FaPaperPlane /> {showVisitOtpField ? "Verify & Schedule" : "Schedule Now"}
+                      </>
+                    )}
+                  </button>
+                  {showVisitOtpField && (
+                    <div className="flex items-center justify-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setShowVisitOtpField(false)}
+                        className="text-[10px] font-bold text-gray-400 hover:text-orange-600 transition-colors uppercase tracking-wider"
+                      >
+                        Edit Information
+                      </button>
+                      <span className="text-gray-300">|</span>
+                      <button
+                        type="button"
+                        onClick={handleVisitResendOtp}
+                        className="text-[10px] font-bold text-gray-400 hover:text-orange-600 transition-colors uppercase tracking-wider"
+                      >
+                        Resend OTP
+                      </button>
+                    </div>
                   )}
-                </button>
+                </div>
               </form>
             </div>
           </div>

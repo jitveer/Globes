@@ -107,6 +107,28 @@ const Contact = () => {
       setIsVerifying(false);
     }
   };
+
+  const handleResendOtp = async () => {
+    try {
+      showPopup("success", "Sending...", "Resending OTP to your mobile number");
+      const res = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/otp/resend`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ recipient: formData.phone }),
+        },
+      );
+      const data = await res.json();
+      if (data.success) {
+        showPopup("success", "OTP Resent", "A new validation code has been sent to your mobile number");
+      } else {
+        showPopup("error", "Error", data.message || "Failed to resend OTP.");
+      }
+    } catch (err) {
+      showPopup("error", "Server Error", "Server error. Please try again.");
+    }
+  };
   return (
     <>
       <SEO
@@ -264,13 +286,23 @@ const Contact = () => {
                         : "Submit"}
                     </button>
                     {showOtpField && (
-                      <button
-                        type="button"
-                        onClick={() => setShowOtpField(false)}
-                        className="text-sm font-bold text-gray-400 hover:text-orange-600 transition-colors"
-                      >
-                        Edit Details
-                      </button>
+                      <div className="flex items-center gap-4">
+                        <button
+                          type="button"
+                          onClick={() => setShowOtpField(false)}
+                          className="text-sm font-bold text-gray-400 hover:text-orange-600 transition-colors"
+                        >
+                          Edit Details
+                        </button>
+                        <span className="text-gray-300">|</span>
+                        <button
+                          type="button"
+                          onClick={handleResendOtp}
+                          className="text-sm font-bold text-gray-400 hover:text-orange-600 transition-colors"
+                        >
+                          Resend OTP
+                        </button>
+                      </div>
                     )}
                   </div>
                 </form>
