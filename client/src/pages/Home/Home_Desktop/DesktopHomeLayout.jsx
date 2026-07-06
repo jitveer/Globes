@@ -113,6 +113,9 @@ const DesktopHomeLayout = () => {
 
   const [showVideoAd, setShowVideoAd] = useState(true);
   const [adVideoUrl, setAdVideoUrl] = useState("https://www.youtube.com/watch?v=dQw4w9WgXcQ"); // Add your YouTube video URL here
+  const [showPopupAd, setShowPopupAd] = useState(false);
+  const [popupAdImageUrl, setPopupAdImageUrl] = useState("");
+  const [popupAdRedirectUrl, setPopupAdRedirectUrl] = useState("");
   const [activeCategory, setActiveCategory] = useState("all");
   const [favorites, setFavorites] = useState([]);
   const [latestRealProperties, setLatestRealProperties] = useState([]);
@@ -333,8 +336,19 @@ const DesktopHomeLayout = () => {
         `${import.meta.env.VITE_API_BASE_URL}/api/v1/settings`
       );
       const data = await res.json();
-      if (data.success && data.data?.homePageAdVideoUrl) {
-        setAdVideoUrl(data.data.homePageAdVideoUrl);
+      if (data.success && data.data) {
+        if (data.data.homePageAdVideoUrl) {
+          setAdVideoUrl(data.data.homePageAdVideoUrl);
+        }
+        if (data.data.popupAdImage) {
+          setPopupAdImageUrl(getImageUrl(data.data.popupAdImage));
+          if (data.data.popupAdUrl) {
+            setPopupAdRedirectUrl(data.data.popupAdUrl);
+          }
+          setTimeout(() => {
+            setShowPopupAd(true);
+          }, 5000);
+        }
       }
     } catch (error) {
       console.error("Failed to load settings:", error);
@@ -1399,6 +1413,29 @@ const DesktopHomeLayout = () => {
         </div>
       </section>
 
+      <section className="py-12 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl font-bold text-gray-900 mb-6 text-center">Quick Links</h2>
+          <div className="flex flex-wrap justify-center gap-4">
+            {[
+              { title: 'Apartments in Rachenahalli', url: 'https://globesproperties.com/apartments-in-rachenahalli/' },
+              { title: 'Apartments in Yelahanka', url: 'https://globesproperties.com/apartments-in-yelahanka' },
+              { title: 'Apartments in Thanisandra', url: 'https://globesproperties.com/apartments-in-thanisandra/' },
+            ].map((link, index) => (
+              <a
+                key={index}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-white border border-gray-200 text-gray-700 hover:text-orange-600 hover:border-orange-600 hover:shadow-md transition-all duration-300 px-6 py-3 rounded-full font-medium text-sm md:text-base"
+              >
+                {link.title}
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <Footer />
 
       {/* Animations */}
@@ -1448,6 +1485,34 @@ const DesktopHomeLayout = () => {
         }
       `}</style>
 
+      {/* Advertisement Popup Modal */}
+      {showPopupAd && popupAdImageUrl && (
+        <div className="fixed inset-0 z-[150] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-[fadeIn_0.3s_ease-out]">
+          <div className="relative bg-white rounded-2xl shadow-2xl overflow-hidden max-w-4xl w-full aspect-[4/3] animate-[scaleIn_0.3s_ease-out] flex justify-center items-center">
+            <button
+              onClick={() => setShowPopupAd(false)}
+              className="absolute top-4 right-4 w-10 h-10 flex items-center justify-center bg-black/50 text-white md:hover:bg-orange-600 rounded-full transition-all duration-300 z-20"
+            >
+              <FaTimes />
+            </button>
+            {popupAdRedirectUrl ? (
+              <a href={popupAdRedirectUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full block" onClick={() => setShowPopupAd(false)}>
+                <img 
+                  src={popupAdImageUrl} 
+                  alt="Advertisement" 
+                  className="w-full h-full object-cover"
+                />
+              </a>
+            ) : (
+              <img 
+                src={popupAdImageUrl} 
+                alt="Advertisement" 
+                className="w-full h-full object-cover"
+              />
+            )}
+          </div>
+        </div>
+      )}
 
       {/* Meeting Schedule Modal */}
       {isModalOpen && (

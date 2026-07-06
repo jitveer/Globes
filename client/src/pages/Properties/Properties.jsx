@@ -540,7 +540,7 @@ const Properties = () => {
                   </div>
 
                   {/* Price Range */}
-                  <div className="mb-6">
+                  {/* <div className="mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-3">
                       Price Range (₹)
                     </label>
@@ -600,7 +600,7 @@ const Properties = () => {
                         />
                       </div>
                     </div>
-                  </div>
+                  </div> */}
 
                   {/* Area Range */}
                   <div className="mb-6">
@@ -1109,7 +1109,7 @@ const Properties = () => {
                 </div>
               </div>
               {/* Price Range */}
-              <div>
+              {/* <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-3">
                   Price Range (₹)
                 </label>
@@ -1169,7 +1169,7 @@ const Properties = () => {
                     />
                   </div>
                 </div>
-              </div>
+              </div> */}
 
               {/* Area Range */}
               <div>

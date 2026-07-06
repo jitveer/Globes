@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 
 const SettingsTab = () => {
-  const [homePageAdVideoUrl, setHomePageAdVideoUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
@@ -14,7 +13,7 @@ const SettingsTab = () => {
         );
         const data = await res.json();
         if (data.success && data.data) {
-          setHomePageAdVideoUrl(data.data.homePageAdVideoUrl || "");
+          // Additional settings fetch logic will go here
         }
       } catch (error) {
         console.error("Failed to load settings:", error);
@@ -38,7 +37,7 @@ const SettingsTab = () => {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify({ homePageAdVideoUrl }),
+          body: JSON.stringify({}), // Other settings can be added here
         }
       );
       const data = await res.json();
@@ -74,11 +73,10 @@ const SettingsTab = () => {
 
       {message.text && (
         <div
-          className={`p-4 rounded-xl text-sm font-semibold ${
-            message.type === "success"
-              ? "bg-green-50 text-green-700 border border-green-200"
-              : "bg-red-50 text-red-700 border border-red-200"
-          }`}
+          className={`p-4 rounded-xl text-sm font-semibold ${message.type === "success"
+            ? "bg-green-50 text-green-700 border border-green-200"
+            : "bg-red-50 text-red-700 border border-red-200"
+            }`}
         >
           {message.text}
         </div>
@@ -168,29 +166,6 @@ const SettingsTab = () => {
           </div>
         </div>
 
-        {/* Ads Settings */}
-        <div className="bg-white rounded-2xl shadow-lg p-6 lg:col-span-2">
-          <h3 className="text-xl font-bold text-gray-900 mb-4">
-            Advertisement Settings
-          </h3>
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
-                Home Page Video Ad URL
-              </label>
-              <input
-                type="text"
-                value={homePageAdVideoUrl}
-                onChange={(e) => setHomePageAdVideoUrl(e.target.value)}
-                placeholder="Enter YouTube URL (e.g., https://www.youtube.com/watch?v=dQw4w9WgXcQ)"
-                className="w-full px-4 py-2 border-2 border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-              />
-              <p className="text-xs text-gray-500 mt-1">
-                Enter any valid YouTube video link. It will automatically autoplay, loop, and be muted on the homepage.
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
 
       <div className="flex justify-end">

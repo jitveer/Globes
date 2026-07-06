@@ -16,10 +16,10 @@ const Home = () => {
 
   return (
     <div className="home-page-content">
-      <SEO 
-        title="Home" 
-        description="Find your dream property with Globes Properties. We offer a wide range of real estate options in Bangalore." 
-        keywords="Globes Properties, real estate, buy home Bangalore, real estate agency" 
+      <SEO
+        title="Home"
+        description="Find your dream property with Globes Properties. We offer a wide range of real estate options in Bangalore."
+        keywords="Globes Properties, real estate, buy home Bangalore, real estate agency"
       />
       {/* {isMobile ? (
         <div>

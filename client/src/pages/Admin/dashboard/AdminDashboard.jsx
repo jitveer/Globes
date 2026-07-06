@@ -10,6 +10,7 @@ import {
   FaCog,
   FaBell,
   FaBullhorn,
+  FaImage,
 } from "react-icons/fa";
 
 // Component Imports
@@ -25,6 +26,7 @@ import SettingsTab from "./components/SettingsTab/SettingsTab";
 import VisitsTab from "./components/VisitsTab/VisitsTab";
 import AdminNotificationTab from "./components/NotificationTab/AdminNotificationTab";
 import UserNotificationTab from "./components/UserNotificationTab/UserNotificationTab";
+import AdvertisementTab from "./components/AdvertisementTab/AdvertisementTab";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -422,6 +424,7 @@ const AdminDashboard = () => {
     { id: "analytics", label: "Analytics", icon: FaChartLine },
     { id: "admin-alerts", label: "Admin Alerts", icon: FaBell },
     { id: "user-notifications", label: "User Notification", icon: FaBullhorn },
+    { id: "advertisement", label: "Advertisement", icon: FaImage },
     { id: "settings", label: "Settings", icon: FaCog },
   ];
 
@@ -487,6 +490,7 @@ const AdminDashboard = () => {
           )}
           {activeTab === "blogs" && <BlogsTab />}
           {activeTab === "analytics" && <AnalyticsTab />}
+          {activeTab === "advertisement" && <AdvertisementTab />}
           {activeTab === "settings" && <SettingsTab />}
           {activeTab === "visits" && <VisitsTab />}
           {activeTab === "user-notifications" && (

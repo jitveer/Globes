@@ -296,11 +296,10 @@ const MobileHomeLayout = () => {
             <button
               key={category.id}
               onClick={() => setActiveCategory(category.id)}
-              className={`flex items-center gap-2 px-5 py-3 rounded-2xl whitespace-nowrap transition-all duration-300 border ${
-                activeCategory === category.id
-                  ? "bg-gray-900 border-gray-900 text-white shadow-xl shadow-gray-900/10 scale-105"
-                  : "bg-white border-gray-100 text-gray-500 hover:border-gray-200"
-              }`}
+              className={`flex items-center gap-2 px-5 py-3 rounded-2xl whitespace-nowrap transition-all duration-300 border ${activeCategory === category.id
+                ? "bg-gray-900 border-gray-900 text-white shadow-xl shadow-gray-900/10 scale-105"
+                : "bg-white border-gray-100 text-gray-500 hover:border-gray-200"
+                }`}
             >
               <category.icon
                 className={`text-lg ${activeCategory === category.id ? "text-orange-500" : ""}`}

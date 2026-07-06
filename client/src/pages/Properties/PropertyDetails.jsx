@@ -46,6 +46,7 @@ import Popup from "../../components/Popup";
 import SEO from "../../components/SEO";
 import WhatsAppButton from "../../components/WhatsAppButton";
 
+
 const iconMap = {
   FaBed,
   FaBath,

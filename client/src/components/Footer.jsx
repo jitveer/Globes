@@ -55,7 +55,7 @@ function Footer() {
             </div>
 
             <div className="text-left md:text-left">
-              <h4 className="font-semibold mb-4 mt-6 md:mt-0">Quick Links</h4>
+              <h4 className="font-semibold mb-4 mt-6 md:mt-0">Menu</h4>
               <ul className="space-y-2 text-gray-400">
                 {["Home", "Properties", "About", "Contact"].map((link) => (
                   <li key={link}>
