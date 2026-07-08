@@ -1497,16 +1497,16 @@ const DesktopHomeLayout = () => {
             </button>
             {popupAdRedirectUrl ? (
               <a href={popupAdRedirectUrl} target="_blank" rel="noopener noreferrer" className="w-full h-full block" onClick={() => setShowPopupAd(false)}>
-                <img 
-                  src={popupAdImageUrl} 
-                  alt="Advertisement" 
+                <img
+                  src={popupAdImageUrl}
+                  alt="Advertisement"
                   className="w-full h-full object-cover"
                 />
               </a>
             ) : (
-              <img 
-                src={popupAdImageUrl} 
-                alt="Advertisement" 
+              <img
+                src={popupAdImageUrl}
+                alt="Advertisement"
                 className="w-full h-full object-cover"
               />
             )}
