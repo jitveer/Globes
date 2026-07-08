@@ -504,7 +504,7 @@ const AdminDashboard = () => {
             />
           )}
           {activeTab === "users" && (
-            <UsersTab recentUsers={users} stats={stats} />
+            <UsersTab recentUsers={users} stats={stats} fetchUsers={fetchUsers} />
           )}
           {activeTab === "inquiries" && (
             <InquiriesTab
