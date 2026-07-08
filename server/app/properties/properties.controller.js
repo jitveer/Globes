@@ -255,6 +255,22 @@ exports.updateProperty = asyncHandler(async (req, res) => {
   if (req.files && req.files.brochure && req.files.brochure.length > 0) {
     const brochureFile = req.files.brochure[0];
     propertyData.brochure = await saveBrochure(brochureFile, propertyTitle);
+  } else {
+    // If no new brochure file is uploaded, retain the existing one from database
+    // unless the frontend explicitly sent an empty string (meaning the user removed it)
+    try {
+      const existing = await propertyService.getPropertyById(req.params.id);
+      if (existing && existing.brochure) {
+        if (propertyData.brochure === undefined) {
+          propertyData.brochure = existing.brochure;
+        } else if (propertyData.brochure === "") {
+          // Explicitly removed by user
+          propertyData.brochure = "";
+        }
+      }
+    } catch (e) {
+      // Ignore if fetch fails
+    }
   }
 
   // Handle price and plan pricing fallbacks
