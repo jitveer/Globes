@@ -305,13 +305,12 @@ const UsersTab = ({ recentUsers = [], stats, fetchUsers }) => {
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          user.role === "admin" || user.role === "superadmin"
-                            ? "bg-red-100 text-red-700"
-                            : user.role === "agent"
-                              ? "bg-blue-100 text-blue-700"
-                              : "bg-gray-100 text-gray-700"
-                        }`}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${user.role === "admin" || user.role === "superadmin"
+                          ? "bg-red-100 text-red-700"
+                          : user.role === "agent"
+                            ? "bg-blue-100 text-blue-700"
+                            : "bg-gray-100 text-gray-700"
+                          }`}
                       >
                         {user.role}
                       </span>
@@ -321,11 +320,10 @@ const UsersTab = ({ recentUsers = [], stats, fetchUsers }) => {
                     </td>
                     <td className="px-6 py-4">
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                          user.isActive
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        }`}
+                        className={`px-3 py-1 rounded-full text-xs font-semibold ${user.isActive
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                          }`}
                       >
                         {user.isActive ? "Active" : "Inactive"}
                       </span>
@@ -397,13 +395,12 @@ const UsersTab = ({ recentUsers = [], stats, fetchUsers }) => {
                   {viewingUser.firstName} {viewingUser.lastName}
                 </h3>
                 <span
-                  className={`mt-2 inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${
-                    viewingUser.role === "admin" || viewingUser.role === "superadmin"
-                      ? "bg-red-100 text-red-700"
-                      : viewingUser.role === "agent"
-                        ? "bg-blue-100 text-blue-700"
-                        : "bg-gray-100 text-gray-700"
-                  }`}
+                  className={`mt-2 inline-block px-3 py-1 rounded-full text-xs font-semibold uppercase ${viewingUser.role === "admin" || viewingUser.role === "superadmin"
+                    ? "bg-red-100 text-red-700"
+                    : viewingUser.role === "agent"
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-gray-100 text-gray-700"
+                    }`}
                 >
                   {viewingUser.role}
                 </span>
@@ -439,11 +436,10 @@ const UsersTab = ({ recentUsers = [], stats, fetchUsers }) => {
                   <div>
                     <p className="text-xs text-gray-400 font-bold uppercase">Account Status</p>
                     <span
-                      className={`mt-1 inline-block px-3 py-0.5 rounded-full text-xs font-bold ${
-                        viewingUser.isActive
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
-                      }`}
+                      className={`mt-1 inline-block px-3 py-0.5 rounded-full text-xs font-bold ${viewingUser.isActive
+                        ? "bg-green-100 text-green-700"
+                        : "bg-red-100 text-red-700"
+                        }`}
                     >
                       {viewingUser.isActive ? "Active Account" : "Inactive Account"}
                     </span>
