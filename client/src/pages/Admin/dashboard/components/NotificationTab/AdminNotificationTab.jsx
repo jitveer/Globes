@@ -11,6 +11,7 @@ import {
   FaInfoCircle,
   FaUsers,
 } from "react-icons/fa";
+import Popup from "../../../../../components/Popup";
 
 const NotificationTab = ({ users = [] }) => {
   const [activeSubTab, setActiveSubTab] = useState("history"); // history | compose
@@ -18,6 +19,13 @@ const NotificationTab = ({ users = [] }) => {
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
+
+  const [popupData, setPopupData] = useState({
+    isOpen: false,
+    type: "info",
+    title: "",
+    message: "",
+  });
 
   // For Compose Notification
   const [composeData, setComposeData] = useState({
@@ -55,7 +63,12 @@ const NotificationTab = ({ users = [] }) => {
   const handleSendNotification = async (e) => {
     e.preventDefault();
     // Logic to send notification - will need backend endpoint
-    alert("This feature will be available once the backend API is ready!");
+    setPopupData({
+      isOpen: true,
+      type: "info",
+      title: "Coming Soon",
+      message: "This feature will be available once the backend API is ready!",
+    });
   };
 
   const filteredNotifications = notifications.filter((notif) => {
@@ -211,6 +224,13 @@ const NotificationTab = ({ users = [] }) => {
           )}
         </div>
       </div>
+      <Popup
+        isOpen={popupData.isOpen}
+        type={popupData.type}
+        title={popupData.title}
+        message={popupData.message}
+        onClose={() => setPopupData({ ...popupData, isOpen: false })}
+      />
     </div>
   );
 };

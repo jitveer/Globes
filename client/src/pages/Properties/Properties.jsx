@@ -21,6 +21,7 @@ import {
 } from "react-icons/fa";
 import { MdApartment } from "react-icons/md";
 import Footer from "../../components/Footer";
+import Popup from "../../components/Popup";
 import SEO from "../../components/SEO";
 
 // ─────────────────────────────────────────────────────────────
@@ -78,6 +79,22 @@ const Properties = () => {
   const [showMobileFilters, setShowMobileFilters] = useState(false);
   const [viewMode, setViewMode] = useState("grid"); // "grid" or "list"
   const [isHeaderScrolled, setIsHeaderScrolled] = useState(false);
+
+  const [popupData, setPopupData] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+  });
+
+  const showPopup = (type, title, message) => {
+    setPopupData({
+      isOpen: true,
+      type,
+      title,
+      message,
+    });
+  };
 
   // Scroll listener for sticky header adjustments
   useEffect(() => {
@@ -359,8 +376,10 @@ const Properties = () => {
     const token = localStorage.getItem("accessToken");
 
     if (!token) {
-      alert("Please login to save properties to your wishlist!");
-      navigate("/auth"); // Redirect to login page
+      showPopup("warning", "Login Required", "Please login to save properties to your wishlist!");
+      setTimeout(() => {
+        navigate("/auth"); // Redirect to login page
+      }, 2000);
       return;
     }
 
@@ -386,11 +405,11 @@ const Properties = () => {
           setFavorites((prev) => prev.filter((id) => id !== propertyId));
         }
       } else {
-        alert(data.message || "Failed to update wishlist");
+        showPopup("error", "Error", data.message || "Failed to update wishlist");
       }
     } catch (error) {
       console.error("Wishlist toggle error:", error);
-      alert("Something went wrong. Please try again.");
+      showPopup("error", "Error", "Something went wrong. Please try again.");
     }
   };
 
@@ -1429,6 +1448,13 @@ const Properties = () => {
           overflow: hidden;
         }
       `}</style>
+      <Popup
+        isOpen={popupData.isOpen}
+        type={popupData.type}
+        title={popupData.title}
+        message={popupData.message}
+        onClose={() => setPopupData({ ...popupData, isOpen: false })}
+      />
       <Footer />
     </div>
   );

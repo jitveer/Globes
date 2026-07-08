@@ -13,11 +13,28 @@ import {
   FaChevronRight,
   FaCheckCircle,
 } from "react-icons/fa";
+import Popup from "../../../../../components/Popup";
 
 const UserNotificationTab = ({ users = [] }) => {
   const [activeSubTab, setActiveSubTab] = useState("history"); // history | compose
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
+
+  const [popupData, setPopupData] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+  });
+
+  const showPopup = (type, title, message) => {
+    setPopupData({
+      isOpen: true,
+      type,
+      title,
+      message,
+    });
+  };
   const [searchQuery, setSearchQuery] = useState("");
 
   // History Filters
@@ -72,7 +89,7 @@ const UserNotificationTab = ({ users = [] }) => {
         formData.targetType === "specific" &&
         formData.recipients.length === 0
       ) {
-        alert("Please select at least one recipient!");
+        showPopup("warning", "Missing Recipients", "Please select at least one recipient!");
         setLoading(false);
         return;
       }
@@ -90,7 +107,7 @@ const UserNotificationTab = ({ users = [] }) => {
       );
       const data = await res.json();
       if (data.success) {
-        alert("Notification broadcasted successfully!");
+        showPopup("success", "Success", "Notification broadcasted successfully!");
         setFormData({
           title: "",
           message: "",
@@ -102,11 +119,11 @@ const UserNotificationTab = ({ users = [] }) => {
         });
         setActiveSubTab("history"); // Switch to history to see the new entry
       } else {
-        alert(data.message || "Failed to send notification");
+        showPopup("error", "Error", data.message || "Failed to send notification");
       }
     } catch (error) {
       console.error("Error sending notification:", error);
-      alert("Something went wrong!");
+      showPopup("error", "Error", "Something went wrong!");
     } finally {
       setLoading(false);
     }
@@ -586,6 +603,13 @@ const UserNotificationTab = ({ users = [] }) => {
           </div>
         </div>
       )}
+      <Popup
+        isOpen={popupData.isOpen}
+        type={popupData.type}
+        title={popupData.title}
+        message={popupData.message}
+        onClose={() => setPopupData({ ...popupData, isOpen: false })}
+      />
     </div>
   );
 };

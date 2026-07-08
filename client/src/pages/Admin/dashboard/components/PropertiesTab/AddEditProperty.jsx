@@ -9,6 +9,7 @@ import {
   FaCode,
   FaFilePdf,
 } from "react-icons/fa";
+import Popup from "../../../../../components/Popup";
 
 const BANGALORE_AREAS = [
   "Whitefield",
@@ -51,6 +52,24 @@ const AddEditProperty = () => {
   const [loading, setLoading] = useState(false);
   const [showJsonPreview, setShowJsonPreview] = useState(false);
   const [showSuggestions, setShowSuggestions] = useState(false);
+
+  const [popupData, setPopupData] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+    onClose: null,
+  });
+
+  const showPopup = (type, title, message, onClose = null) => {
+    setPopupData({
+      isOpen: true,
+      type,
+      title,
+      message,
+      onClose,
+    });
+  };
 
   // Helper function to format image URLs
   const getImageUrl = (imageInput) => {
@@ -409,7 +428,7 @@ const AddEditProperty = () => {
         }
       } catch (error) {
         console.error("Error fetching property:", error);
-        alert("Failed to load property details.");
+        showPopup("error", "Error", "Failed to load property details.");
       } finally {
         setLoading(false);
       }
@@ -475,7 +494,7 @@ const AddEditProperty = () => {
     if (file) {
       // Check file size (limit to 5MB to prevent huge payloads)
       if (file.size > 5 * 1024 * 1024) {
-        alert("File size too large! Please select an image under 5MB.");
+        showPopup("warning", "File Too Large", "File size too large! Please select an image under 5MB.");
         return;
       }
 
@@ -528,11 +547,11 @@ const AddEditProperty = () => {
     const file = e.target.files[0];
     if (file) {
       if (file.type !== "application/pdf") {
-        alert("Please upload a PDF file only!");
+        showPopup("warning", "Invalid Format", "Please upload a PDF file only!");
         return;
       }
       if (file.size > 10 * 1024 * 1024) {
-        alert("File size too large! Please select a PDF under 10MB.");
+        showPopup("warning", "File Too Large", "File size too large! Please select a PDF under 10MB.");
         return;
       }
 
@@ -644,31 +663,31 @@ const AddEditProperty = () => {
 
     // Validation
     if (!formData.title?.trim()) {
-      alert("Project Title is required.");
+      showPopup("warning", "Required Field", "Project Title is required.");
       return;
     }
     if (!formData.type) {
-      alert("Property Type is required.");
+      showPopup("warning", "Required Field", "Property Type is required.");
       return;
     }
     if (!formData.description?.trim()) {
-      alert("Description is required.");
+      showPopup("warning", "Required Field", "Description is required.");
       return;
     }
     if (!formData.availability) {
-      alert("Availability is required.");
+      showPopup("warning", "Required Field", "Availability is required.");
       return;
     }
     if (!formData.location?.address?.trim()) {
-      alert("Full Address is required.");
+      showPopup("warning", "Required Field", "Full Address is required.");
       return;
     }
     if (!formData.location?.city) {
-      alert("City is required.");
+      showPopup("warning", "Required Field", "City is required.");
       return;
     }
     if (!formData.location?.area) {
-      alert("Area is required.");
+      showPopup("warning", "Required Field", "Area is required.");
       return;
     }
 
@@ -731,21 +750,25 @@ const AddEditProperty = () => {
       const data = await response.json();
 
       if (data.success) {
-        alert(
+        showPopup(
+          "success",
+          "Success",
           isEditMode
             ? "Property updated successfully!"
             : "Property added successfully!",
+          () => navigate("/admin")
         );
-        navigate("/admin");
       } else {
-        alert("Error: " + data.message);
+        showPopup("error", "Error", "Error: " + data.message);
       }
     } catch (error) {
       console.error(
         isEditMode ? "Error updating property:" : "Error adding property:",
         error,
       );
-      alert(
+      showPopup(
+        "error",
+        "Failed",
         isEditMode
           ? "Failed to update property. Please try again."
           : "Failed to add property. Please try again.",
@@ -1947,6 +1970,18 @@ const AddEditProperty = () => {
           </div>
         </div>
       )}
+      <Popup
+        isOpen={popupData.isOpen}
+        type={popupData.type}
+        title={popupData.title}
+        message={popupData.message}
+        onClose={() => {
+          if (popupData.onClose) {
+            popupData.onClose();
+          }
+          setPopupData({ ...popupData, isOpen: false });
+        }}
+      />
     </div>
   );
 };

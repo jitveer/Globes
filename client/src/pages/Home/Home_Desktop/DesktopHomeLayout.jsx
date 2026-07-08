@@ -1104,19 +1104,30 @@ const DesktopHomeLayout = () => {
 
                 if (!showOtpField) {
                   if (!nameRegex.test(formData.name)) {
-                    alert(
-                      "Kripya sahi naam bharein (sirf characters allow hain).",
-                    );
+                    setPopupData({
+                      isOpen: true,
+                      type: "warning",
+                      title: "Invalid Name",
+                      message: "Please enter a valid name (only letters are allowed).",
+                    });
                     return;
                   }
                   if (!emailRegex.test(formData.email)) {
-                    alert("Kripya ek valid email address bharein.");
+                    setPopupData({
+                      isOpen: true,
+                      type: "warning",
+                      title: "Invalid Email",
+                      message: "Please enter a valid email address.",
+                    });
                     return;
                   }
                   if (!phoneRegex.test(formData.phone)) {
-                    alert(
-                      "Kripya 10-digit ka valid mobile number bharein (jo 6-9 se shuru ho).",
-                    );
+                    setPopupData({
+                      isOpen: true,
+                      type: "warning",
+                      title: "Invalid Phone",
+                      message: "Please enter a valid 10-digit mobile number starting with 6-9.",
+                    });
                     return;
                   }
                 }
@@ -1138,12 +1149,19 @@ const DesktopHomeLayout = () => {
 
                     if (data.success) {
                       setShowOtpField(true);
-                      alert("OTP Sent");
+                      setPopupData({
+                        isOpen: true,
+                        type: "success",
+                        title: "OTP Sent",
+                        message: "OTP Sent successfully! Please check your email.",
+                      });
                     } else {
-                      alert(
-                        data.message ||
-                        "OTP bhejne mein samasya hui. Kripya punah prayas karein.",
-                      );
+                      setPopupData({
+                        isOpen: true,
+                        type: "error",
+                        title: "Error",
+                        message: data.message || "There was a problem sending the OTP. Please try again.",
+                      });
                     }
                   } else {
                     // STEP 2: Verify OTP and Submit Inquiry
@@ -1158,9 +1176,12 @@ const DesktopHomeLayout = () => {
                     const data = await res.json();
 
                     if (data.success) {
-                      alert(
-                        "Thank you! Your inquiry has been submitted successfully.",
-                      );
+                      setPopupData({
+                        isOpen: true,
+                        type: "success",
+                        title: "Success",
+                        message: "Thank you! Your inquiry has been submitted successfully.",
+                      });
                       setFormData({
                         name: "",
                         email: "",
@@ -1170,15 +1191,21 @@ const DesktopHomeLayout = () => {
                       setOtp("");
                       setShowOtpField(false);
                     } else {
-                      alert(
-                        data.message || "Galat OTP! Kripya sahi OTP dalein.",
-                      );
+                      setPopupData({
+                        isOpen: true,
+                        type: "error",
+                        title: "Verification Failed",
+                        message: data.message || "Incorrect OTP! Please enter the correct OTP.",
+                      });
                     }
                   }
                 } catch (err) {
-                  alert(
-                    "Server error. Kripya check karein ki backend chal raha hai.",
-                  );
+                  setPopupData({
+                    isOpen: true,
+                    type: "error",
+                    title: "Server Error",
+                    message: "Server error. Please verify if the backend is running.",
+                  });
                 } finally {
                   setIsVerifying(false);
                 }
@@ -1295,11 +1322,10 @@ const DesktopHomeLayout = () => {
                       />
                     </div>
                     <p className="text-gray-500 text-sm font-medium text-center">
-                      Ek special OTP{" "}
+                      A special OTP has been sent to{" "}
                       <span className="text-orange-600 font-bold">
                         {formData.phone}
-                      </span>{" "}
-                      par bheja gaya hai.
+                      </span>.
                     </p>
                   </div>
                 </div>

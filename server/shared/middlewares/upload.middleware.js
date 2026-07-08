@@ -1,15 +1,15 @@
 /**
  * Upload Middleware (Multer - Memory Storage)
  *
- * NOTE: Ab hum diskStorage ki jagah memoryStorage use kar rahe hain.
- * File directly disk pe NAHI jayegi — buffer milega controller ko.
- * Controller phir imageOptimizer.js microservice ko call karega jo
- * 3 versions (original PNG, optimized WebP, thumbnail WebP) banayega
- * aur sahi folder mein save karega.
+ * NOTE: We are now using memoryStorage instead of diskStorage.
+ * Files will not go directly to disk — the buffer will be received by the controller.
+ * The controller will then call the imageOptimizer.js microservice, which
+ * will generate 3 versions (original PNG, optimized WebP, thumbnail WebP)
+ * and save them to the correct folder.
  *
- * Is approach ke fayde:
- *  - Sharp processing ke liye buffer zarori hai
- *  - File save ka poora control controller ke paas hai
+ * Benefits of this approach:
+ *  - Buffer is required for Sharp processing
+ *  - Full control over file saving is with the controller
  *  - Clean microservices pattern
  *
  * Allowed file types:
@@ -19,7 +19,7 @@
 
 const multer = require("multer");
 
-// Memory storage: file disk pe nahi, memory (buffer) mein aayegi
+// Memory storage: files will be stored in memory (buffer), not on disk
 const storage = multer.memoryStorage();
 
 const fileFilter = (req, file, cb) => {

@@ -8,10 +8,27 @@ import {
   FaUser,
   FaBuilding,
 } from "react-icons/fa";
+import Popup from "../../../../../components/Popup";
 
 const InquiriesTab = ({ recentInquiries = [], fetchInquiries, stats }) => {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("All Status");
+
+  const [popupData, setPopupData] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+  });
+
+  const showPopup = (type, title, message) => {
+    setPopupData({
+      isOpen: true,
+      type,
+      title,
+      message,
+    });
+  };
 
   const handleUpdateStatus = async (id, newStatus) => {
     try {
@@ -31,11 +48,11 @@ const InquiriesTab = ({ recentInquiries = [], fetchInquiries, stats }) => {
       if (data.success) {
         fetchInquiries(); // Refresh the list
       } else {
-        alert(data.message || "Failed to update status");
+        showPopup("error", "Error", data.message || "Failed to update status");
       }
     } catch (error) {
       console.error("Error updating status:", error);
-      alert("Something went wrong");
+      showPopup("error", "Error", "Something went wrong");
     }
   };
 
@@ -232,6 +249,13 @@ const InquiriesTab = ({ recentInquiries = [], fetchInquiries, stats }) => {
           )}
         </div>
       </div>
+      <Popup
+        isOpen={popupData.isOpen}
+        type={popupData.type}
+        title={popupData.title}
+        message={popupData.message}
+        onClose={() => setPopupData({ ...popupData, isOpen: false })}
+      />
     </div>
   );
 };

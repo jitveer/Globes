@@ -1,11 +1,30 @@
 import React, { useEffect, useState } from "react";
 import { FaBlog, FaPlus, FaEdit, FaTrash, FaEye } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import Popup from "../../../../../components/Popup";
 
 const BlogsTab = () => {
   const navigate = useNavigate();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  const [popupData, setPopupData] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
+
+  const showPopup = (type, title, message, onConfirm = null) => {
+    setPopupData({
+      isOpen: true,
+      type,
+      title,
+      message,
+      onConfirm,
+    });
+  };
 
   useEffect(() => {
     const fetchBlogs = async () => {
@@ -54,9 +73,7 @@ const BlogsTab = () => {
     }
   };
 
-  const handleDelete = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this blog?")) return;
-
+  const executeDelete = async (id) => {
     try {
       const res = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/api/v1/blogs/${id}`,
@@ -70,11 +87,20 @@ const BlogsTab = () => {
       const data = await res.json();
       if (data.success) {
         setBlogs(blogs.filter((blog) => blog._id !== id));
-        alert("Blog deleted successfully");
+        showPopup("success", "Success", "Blog deleted successfully");
       }
     } catch (error) {
       console.error("Error deleting blog:", error);
     }
+  };
+
+  const handleDelete = (id) => {
+    showPopup(
+      "warning",
+      "Confirm Delete",
+      "Are you sure you want to delete this blog?",
+      () => executeDelete(id)
+    );
   };
 
   return (
@@ -232,6 +258,14 @@ const BlogsTab = () => {
           </div>
         )}
       </div>
+      <Popup
+        isOpen={popupData.isOpen}
+        type={popupData.type}
+        title={popupData.title}
+        message={popupData.message}
+        onConfirm={popupData.onConfirm}
+        onClose={() => setPopupData({ ...popupData, isOpen: false })}
+      />
     </div>
   );
 };

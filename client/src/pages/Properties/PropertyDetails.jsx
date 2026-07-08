@@ -394,15 +394,15 @@ const PropertyDetails = () => {
 
     if (!showOtpField) {
       if (!nameRegex.test(formData.name)) {
-        showPopup("warning", "Invalid Name", "Kripya sahi naam bharein.");
+        showPopup("warning", "Invalid Name", "Please enter your name.");
         return;
       }
       if (!emailRegex.test(formData.email)) {
-        showPopup("warning", "Invalid Email", "Kripya valid email bharein.");
+        showPopup("warning", "Invalid Email", "Please enter a valid email address.");
         return;
       }
       if (!phoneRegex.test(formData.phone)) {
-        showPopup("warning", "Invalid Phone", "Kripya 10-digit mobile number bharein (6-9 se shuru).");
+        showPopup("warning", "Invalid Phone", "Please enter a valid 10-digit mobile number starting with 6-9.");
         return;
       }
     }
@@ -425,7 +425,7 @@ const PropertyDetails = () => {
           setShowOtpField(true);
           showPopup("success", "OTP Sent", "Validation code sent to your mobile number");
         } else {
-          showPopup("error", "Error", data.message || "OTP bhejne mein samasya hui.");
+          showPopup("error", "Error", data.message || "Failed to send OTP.");
         }
       } else {
         // STEP 2: Verify OTP and Submit
@@ -444,11 +444,11 @@ const PropertyDetails = () => {
           setOtp("");
           setShowOtpField(false);
         } else {
-          showPopup("error", "Verification Failed", data.message || "Galat OTP!");
+          showPopup("error", "Verification Failed", data.message || "Incorrect OTP!");
         }
       }
     } catch (err) {
-      showPopup("error", "Server Error", "Server error. Kripya check karein ki backend chal raha hai.");
+      showPopup("error", "Server Error", "Server error. Please verify if the backend is running.");
     } finally {
       setIsVerifying(false);
     }
@@ -833,7 +833,7 @@ const PropertyDetails = () => {
                       .catch((err) => console.log("Error sharing:", err));
                   } else {
                     navigator.clipboard.writeText(window.location.href)
-                      .then(() => alert("Property link copied to clipboard!"))
+                      .then(() => setPopup({ isOpen: true, type: "success", title: "Copied", message: "Property link copied to clipboard!" }))
                       .catch((err) => console.error("Clipboard copy failed:", err));
                   }
                 }}
@@ -1394,7 +1394,7 @@ const PropertyDetails = () => {
                           : `${baseUrl}${path}`;
                         window.open(url, "_blank");
                       } else {
-                        alert("Brochure not available at the moment.");
+                        setPopup({ isOpen: true, type: "warning", title: "Not Available", message: "Brochure not available at the moment." });
                       }
                     }}
                     className="flex items-center gap-3 px-8 py-4 bg-orange-600 hover:bg-orange-500 text-white rounded-xl font-black text-sm md:text-base shadow-lg hover:shadow-orange-500/30 transition-all duration-300 hover:-translate-y-1 active:scale-95 group/btn"

@@ -1,13 +1,13 @@
 # 🧩 Microservices
 
-Ye folder independent, single-responsibility utility services ke liye hai.
-Ye services kisi bhi module ke saath integrate ho sakti hain.
+This folder is for independent, single-responsibility utility services.
+These services can be integrated with any module.
 
-## Kab yahan dalna chahiye?
+## When should a service be added here?
 
-- Agar koi functionality ek se zyada jagah use hoti hai
-- Agar koi complex processing logic controller se alag rakhni ho
-- Agar future mein use kisi separate process ya service mein move karna ho
+- If a functionality is used in more than one place
+- If any complex processing logic needs to be separated from controllers
+- If in the future it needs to be moved to a separate process or service
 
 ---
 
@@ -15,7 +15,7 @@ Ye services kisi bhi module ke saath integrate ho sakti hain.
 
 ### `imageOptimizer.js`
 
-**Purpose:** Ek uploaded image se 3 optimized versions banata hai.
+**Purpose:** Generates 3 optimized versions from an uploaded image.
 
 **Flow:**
 ```
@@ -35,10 +35,10 @@ Output: { original, webp, thumbnail, baseName }
 **Progressive Loading Strategy (Frontend):**
 ```
 Page load
-  → Pehle `thumbnail` (blurred, <20KB) load hoti hai instantly
-  → Jab `webp` (200KB) fully load ho jata hai
-  → thumbnail ko replace kar do with webp
-  → User ko smooth, non-jarring image transition milta hai
+  → First, the `thumbnail` (blurred, <20KB) loads instantly
+  → Once the `webp` (200KB) is fully loaded
+  → Replace the thumbnail with webp
+  → Users get a smooth, non-jarring image transition
 ```
 
 **Usage:**
@@ -69,6 +69,6 @@ const result = await optimizeAndSaveImages(
 | Service | Purpose |
 |---|---|
 | `pdfOptimizer.js` | Brochure PDF compression & thumbnail generation |
-| `videoThumbnail.js` | Property video se thumbnail extract karna |
-| `watermark.js` | Images pe brand watermark lagana |
-| `geoCode.js` | Address se lat/lng coordinates nikalna |
+| `videoThumbnail.js` | Extract thumbnail from property video |
+| `watermark.js` | Apply brand watermark to images |
+| `geoCode.js` | Extract lat/lng coordinates from address |

@@ -25,6 +25,7 @@ import {
   FaGlobe,
   FaEdit,
 } from "react-icons/fa";
+import Popup from "../../../../../components/Popup";
 
 /**
  * BlogEditor Component
@@ -36,6 +37,24 @@ const BlogEditor = () => {
   const isEditMode = !!id;
   const editorRef = useRef(null); // EditorJS instance hold karne ke liye ref
   const [loading, setLoading] = useState(false);
+
+  const [popupData, setPopupData] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+    onClose: null,
+  });
+
+  const showPopup = (type, title, message, onClose = null) => {
+    setPopupData({
+      isOpen: true,
+      type,
+      title,
+      message,
+      onClose,
+    });
+  };
 
   const [blogData, setBlogData] = useState({
     title: "",
@@ -227,7 +246,7 @@ const BlogEditor = () => {
   const handleSave = async (statusOverride = null) => {
     // Validation: Title hona zaroori hai
     if (!blogData.title) {
-      alert("Please enter a blog title");
+      showPopup("warning", "Required Field", "Please enter a blog title");
       return;
     }
 
@@ -242,7 +261,7 @@ const BlogEditor = () => {
         content,
         status: statusOverride || blogData.status,
         // Tags ko string se array mein convert karte hain
-        tags: blogData.tags
+        tags: (blogData.tags || "")
           .split(",")
           .map((tag) => tag.trim())
           .filter((tag) => tag !== ""),
@@ -264,14 +283,18 @@ const BlogEditor = () => {
 
       const data = await res.json();
       if (data.success) {
-        alert(`Blog ${isEditMode ? "updated" : "published"} successfully!`);
-        navigate("/admin"); // Dashboard par wapas bhej dete hain
+        showPopup(
+          "success",
+          "Success",
+          `Blog ${isEditMode ? "updated" : "published"} successfully!`,
+          () => navigate("/admin")
+        );
       } else {
-        alert("Error: " + data.message);
+        showPopup("error", "Error", "Error: " + data.message);
       }
     } catch (error) {
       console.error("Error saving blog:", error);
-      alert("Failed to save blog");
+      showPopup("error", "Error", "Failed to save blog");
     } finally {
       setLoading(false);
     }
@@ -533,6 +556,18 @@ const BlogEditor = () => {
           )}
         </aside>
       </main>
+      <Popup
+        isOpen={popupData.isOpen}
+        type={popupData.type}
+        title={popupData.title}
+        message={popupData.message}
+        onClose={() => {
+          if (popupData.onClose) {
+            popupData.onClose();
+          }
+          setPopupData({ ...popupData, isOpen: false });
+        }}
+      />
     </div>
   );
 };

@@ -11,6 +11,7 @@ import {
   FaCheckCircle,
   FaHome,
 } from "react-icons/fa";
+import Popup from "../../components/Popup";
 
 // Dummy property data
 const dummyProperty = {
@@ -55,6 +56,22 @@ const Inquiry = () => {
   const [isVerifying, setIsVerifying] = useState(false);
   const [botField, setBotField] = useState(""); // Honeypot field
 
+  const [popupData, setPopupData] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+  });
+
+  const showPopup = (type, title, message) => {
+    setPopupData({
+      isOpen: true,
+      type,
+      title,
+      message,
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -68,17 +85,15 @@ const Inquiry = () => {
 
     if (!showOtpField) {
       if (!nameRegex.test(formData.name)) {
-        alert("Kripya sahi naam bharein (sirf characters allow hain).");
+        showPopup("warning", "Invalid Name", "Please enter a valid name (only letters are allowed).");
         return;
       }
       if (!emailRegex.test(formData.email)) {
-        alert("Kripya ek valid email address bharein.");
+        showPopup("warning", "Invalid Email", "Please enter a valid email address.");
         return;
       }
       if (!phoneRegex.test(formData.phone)) {
-        alert(
-          "Kripya 10-digit ka valid mobile number bharein (jo 6-9 se shuru ho).",
-        );
+        showPopup("warning", "Invalid Phone", "Please enter a valid 10-digit mobile number starting with 6-9.");
         return;
       }
     }
@@ -99,9 +114,9 @@ const Inquiry = () => {
         const data = await res.json();
         if (data.success) {
           setShowOtpField(true);
-          alert("OTP bhej diya hai! Please email check karein!");
+          showPopup("success", "OTP Sent", "OTP has been sent! Please check your email.");
         } else {
-          alert(data.message || "OTP bhejne mein samasya hui.");
+          showPopup("error", "Error", data.message || "Failed to send OTP.");
         }
       } else {
         // Step 2: Verify OTP
@@ -115,14 +130,14 @@ const Inquiry = () => {
         );
         const data = await res.json();
         if (data.success) {
-          alert("Mubaarak ho! Aapka visit schedule ho gaya hai.");
+          showPopup("success", "Scheduled", "Congratulations! Your visit has been scheduled.");
           setSubmitted(true);
         } else {
-          alert(data.message || "Galat OTP!");
+          showPopup("error", "Verification Failed", data.message || "Incorrect OTP!");
         }
       }
     } catch (err) {
-      alert("Server error. Please try again.");
+      showPopup("error", "Error", "Server error. Please try again.");
     } finally {
       setIsVerifying(false);
     }
@@ -458,6 +473,13 @@ const Inquiry = () => {
           to { opacity: 1; }
         }
       `}</style>
+      <Popup
+        isOpen={popupData.isOpen}
+        type={popupData.type}
+        title={popupData.title}
+        message={popupData.message}
+        onClose={() => setPopupData({ ...popupData, isOpen: false })}
+      />
     </div>
   );
 };

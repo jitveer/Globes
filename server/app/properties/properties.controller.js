@@ -11,7 +11,7 @@ const fs = require("fs");
 async function processPropertyImages(files, imagesData, propertyTitle) {
   if (!imagesData || !Array.isArray(imagesData)) return [];
 
-  // Folder name: property title se sanitize karke
+  // Sanitize property title for the folder name
   const subFolder = propertyTitle
     ? propertyTitle
       .toLowerCase()
@@ -105,12 +105,12 @@ async function saveBrochure(file, propertyTitle) {
 
   const destDir = path.join("uploads", "properties", subFolder);
 
-  // 1. Destination folder ensure karo
+  // 1. Ensure destination folder exists
   if (!fs.existsSync(destDir)) {
     fs.mkdirSync(destDir, { recursive: true });
   }
 
-  // 2. Unique name banao
+  // 2. Generate unique name
   const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
   const ext = path.extname(file.originalname) || ".pdf";
   const fileName = `brochure-${uniqueSuffix}${ext}`;

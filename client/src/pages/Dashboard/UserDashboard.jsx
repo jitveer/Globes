@@ -135,6 +135,22 @@ const UserDashboard = () => {
   const [loadingList, setLoadingList] = useState(false);
   const [notificationFilter, setNotificationFilter] = useState("all");
 
+  const [popupData, setPopupData] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+  });
+
+  const showPopup = (type, title, message) => {
+    setPopupData({
+      isOpen: true,
+      type,
+      title,
+      message,
+    });
+  };
+
   useEffect(() => {
     if (!authLoading && !contextUser) {
       navigate("/login");
@@ -235,13 +251,13 @@ const UserDashboard = () => {
 
     // Validate file type
     if (!file.type.startsWith("image/")) {
-      alert("Kripya sirf images upload karein.");
+      showPopup("warning", "Invalid File", "Please upload images only.");
       return;
     }
 
     // Validate file size (e.g., 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert("File ka size 5MB se kam hona chahiye.");
+      showPopup("warning", "File Too Large", "File size should be less than 5MB.");
       return;
     }
 
@@ -263,7 +279,7 @@ const UserDashboard = () => {
       const data = await response.json();
 
       if (response.ok) {
-        alert("Profile image updated successfully!");
+        showPopup("success", "Success", "Profile image updated successfully!");
 
         // Update local state
         const updatedUser = {
@@ -277,11 +293,11 @@ const UserDashboard = () => {
         storedUser.avatar = data.data.avatar;
         localStorage.setItem("user", JSON.stringify(storedUser));
       } else {
-        alert(data.message || "Upload failed");
+        showPopup("error", "Failed", data.message || "Upload failed");
       }
     } catch (error) {
       console.error("Avatar upload error:", error);
-      alert("Server error during upload. Please try again.");
+      showPopup("error", "Error", "Server error during upload. Please try again.");
     }
   };
 
@@ -322,7 +338,7 @@ const UserDashboard = () => {
       }
     } catch (error) {
       console.error("Error removing property:", error);
-      alert("Failed to remove property. Please try again.");
+      showPopup("error", "Error", "Failed to remove property. Please try again.");
     }
   };
 
@@ -849,6 +865,13 @@ const UserDashboard = () => {
         message="Are you sure you want to log out?"
         onConfirm={confirmLogout}
         onClose={() => setShowLogoutConfirm(false)}
+      />
+      <Popup
+        isOpen={popupData.isOpen}
+        type={popupData.type}
+        title={popupData.title}
+        message={popupData.message}
+        onClose={() => setPopupData({ ...popupData, isOpen: false })}
       />
     </div>
   );

@@ -2,16 +2,16 @@
  * ============================================================
  *  IMAGE OPTIMIZER MICROSERVICE
  * ============================================================
- *  Ye microservice ek uploaded image buffer leta hai aur
- *  uske 3 versions banata hai:
+ *  This microservice takes an uploaded image buffer and
+ *  generates 3 versions of it:
  *
- *  1. myimage.png        → Original image (bina kisi change ke)
- *  2. myimage.webp       → Optimized WebP (100-200 KB, main display ke liye)
- *  3. myimage_thum.webp  → Thumbnail WebP (< 20 KB, blurred, fast loading ke liye)
+ *  1. myimage.png        → Original image (without changes)
+ *  2. myimage.webp       → Optimized WebP (100-200 KB, for main display)
+ *  3. myimage_thum.webp  → Thumbnail WebP (< 20 KB, blurred, for fast loading)
  *
  *  Progressive Loading Strategy:
- *  - Pehle blurry thumbnail load hoti hai (instant)
- *  - Jab full webp load ho jata hai, thumbnail replace ho jaata hai
+ *  - First, the blurry thumbnail loads instantly
+ *  - Once the full webp is loaded, the thumbnail is replaced
  *
  *  Usage:
  *    const { optimizeAndSaveImages } = require('../../microservices/imageOptimizer');
@@ -25,55 +25,55 @@ const path = require("path");
 const fs = require("fs");
 
 /**
- * Ek image ke 3 versions banata hai aur save karta hai.
+ * Generates and saves 3 versions of an image.
  *
- * @param {Buffer} imageBuffer    - Multer se mila hua image buffer
- * @param {string} originalName   - Original file ka naam (e.g. "house.jpg")
- * @param {string} destDir        - Jis folder mein save karna hai (e.g. "uploads/properties/my-property")
+ * @param {Buffer} imageBuffer    - Image buffer received from Multer
+ * @param {string} originalName   - Original filename (e.g. "house.jpg")
+ * @param {string} destDir        - Folder where images should be saved (e.g. "uploads/properties/my-property")
  *
  * @returns {Promise<{
- *   original: string,    - Saved original PNG ka relative path
- *   webp: string,        - Saved optimized WebP ka relative path
- *   thumbnail: string,   - Saved thumbnail WebP ka relative path
- *   baseName: string     - Base name jo use hua (bina extension)
+ *   original: string,    - Relative path of saved original PNG
+ *   webp: string,        - Relative path of saved optimized WebP
+ *   thumbnail: string,   - Relative path of saved thumbnail WebP
+ *   baseName: string     - Base name used (without extension)
  * }>}
  */
 async function optimizeAndSaveImages(imageBuffer, originalName, destDir) {
-  // 1. Destination folder ensure karo
+  // 1. Ensure destination folder exists
   if (!fs.existsSync(destDir)) {
     fs.mkdirSync(destDir, { recursive: true });
   }
 
-  // 2. Unique base name banao (timestamp + random)
+  // 2. Generate unique base name (timestamp + random)
   const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
   const baseName = `img-${uniqueSuffix}`;
 
-  // File paths define karo
+  // Define file paths
   const originalPath = path.join(destDir, `${baseName}.png`);
   const webpPath = path.join(destDir, `${baseName}.webp`);
   const thumbPath = path.join(destDir, `${baseName}_thum.webp`);
 
   // ─────────────────────────────────────────────
-  // VERSION 1: Original PNG (koi change nahi)
+  // VERSION 1: Original PNG (no changes)
   // ─────────────────────────────────────────────
   await sharp(imageBuffer).png({ compressionLevel: 6 }).toFile(originalPath);
 
   // ─────────────────────────────────────────────
   // VERSION 2: Optimized WebP (100-200 KB)
   // Target size: <= 200KB
-  // Strategy: quality ko adjust karenge size ke hisaab se
+  // Strategy: adjust quality according to size
   // ─────────────────────────────────────────────
   const webpBuffer = await _createOptimizedWebP(imageBuffer, 200);
   fs.writeFileSync(webpPath, webpBuffer);
 
   // ─────────────────────────────────────────────
   // VERSION 3: Thumbnail WebP (< 20KB, blurred)
-  // Yeh progressive loading ke liye hai
+  // This is used for progressive loading
   // ─────────────────────────────────────────────
   const thumbBuffer = await _createThumbnailWebP(imageBuffer, 20);
   fs.writeFileSync(thumbPath, thumbBuffer);
 
-  // Relative paths return karo (forward slashes for URLs)
+  // Return relative paths (forward slashes for URLs)
   const toUrlPath = (p) => "/" + p.replace(/\\/g, "/");
 
   return {
@@ -85,8 +85,8 @@ async function optimizeAndSaveImages(imageBuffer, originalName, destDir) {
 }
 
 /**
- * Optimized WebP banata hai jo targetSizeKB ke andar ho.
- * Binary search se quality adjust karta hai.
+ * Creates an optimized WebP image that is within targetSizeKB.
+ * Adjusts quality using binary search.
  *
  * @param {Buffer} inputBuffer
  * @param {number} targetSizeKB  - Maximum allowed size in KB (default 200)
@@ -95,11 +95,11 @@ async function optimizeAndSaveImages(imageBuffer, originalName, destDir) {
 async function _createOptimizedWebP(inputBuffer, targetSizeKB = 200) {
   const targetBytes = targetSizeKB * 1024;
 
-  // Pehle image metadata lo (width, height)
+  // Get image metadata (width, height)
   const meta = await sharp(inputBuffer).metadata();
   const originalWidth = meta.width || 1920;
 
-  // Max width cap karo (bahut badi image resize ho)
+  // Cap max width (resize if the image is extremely large)
   const maxWidth = Math.min(originalWidth, 1920);
 
   let quality = 82; // Starting quality
@@ -107,7 +107,7 @@ async function _createOptimizedWebP(inputBuffer, targetSizeKB = 200) {
   let maxQ = 90;
   let bestBuffer = null;
 
-  // Binary search: quality adjust karo taaki size target ke andar rahe
+  // Binary search: adjust quality so that size is within target
   for (let attempt = 0; attempt < 8; attempt++) {
     const buf = await sharp(inputBuffer)
       .resize({ width: maxWidth, withoutEnlargement: true })
@@ -118,7 +118,7 @@ async function _createOptimizedWebP(inputBuffer, targetSizeKB = 200) {
       bestBuffer = buf;
       minQ = quality + 1; // Try higher quality
     } else {
-      maxQ = quality - 1; // Lower quality chahiye
+      maxQ = quality - 1; // Needs lower quality
     }
 
     quality = Math.round((minQ + maxQ) / 2);
@@ -126,7 +126,7 @@ async function _createOptimizedWebP(inputBuffer, targetSizeKB = 200) {
     if (minQ > maxQ) break;
   }
 
-  // Agar koi acceptable buffer nahi mila to low quality fallback
+  // Fallback to lower quality if no acceptable buffer was found
   if (!bestBuffer) {
     bestBuffer = await sharp(inputBuffer)
       .resize({ width: maxWidth, withoutEnlargement: true })
@@ -138,10 +138,10 @@ async function _createOptimizedWebP(inputBuffer, targetSizeKB = 200) {
 }
 
 /**
- * Thumbnail WebP banata hai:
- * - 20KB se kam size
- * - Thoda blurred (placeholder effect ke liye)
- * - Chhoti dimensions
+ * Creates a Thumbnail WebP image:
+ * - Size under 20KB
+ * - Slightly blurred (for placeholder effect)
+ * - Small dimensions
  *
  * @param {Buffer} inputBuffer
  * @param {number} targetSizeKB  - Maximum allowed size in KB (default 20)
@@ -150,9 +150,9 @@ async function _createOptimizedWebP(inputBuffer, targetSizeKB = 200) {
 async function _createThumbnailWebP(inputBuffer, targetSizeKB = 20) {
   const targetBytes = targetSizeKB * 1024;
 
-  // Thumbnail dimensions: max 400px wide (placeholder ke liye kaafi hai)
+  // Thumbnail dimensions: max 400px wide (sufficient for placeholders)
   const THUMB_WIDTH = 400;
-  // Blur sigma: 2-3 kaafi achha lagta hai (too much blur = ugly)
+  // Blur sigma: 2-3 looks good (too much blur = ugly)
   const BLUR_SIGMA = 2.5;
 
   let quality = 40;
@@ -179,7 +179,7 @@ async function _createThumbnailWebP(inputBuffer, targetSizeKB = 20) {
     if (minQ > maxQ) break;
   }
 
-  // Agar target size nahi mili to aur chhoti size try karo
+  // Try even smaller size if target size was not met
   if (!bestBuffer) {
     bestBuffer = await sharp(inputBuffer)
       .resize({ width: 200, withoutEnlargement: true })

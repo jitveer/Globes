@@ -27,6 +27,7 @@ import VisitsTab from "./components/VisitsTab/VisitsTab";
 import AdminNotificationTab from "./components/NotificationTab/AdminNotificationTab";
 import UserNotificationTab from "./components/UserNotificationTab/UserNotificationTab";
 import AdvertisementTab from "./components/AdvertisementTab/AdvertisementTab";
+import Popup from "../../../components/Popup";
 
 const AdminDashboard = () => {
   const navigate = useNavigate();
@@ -38,6 +39,24 @@ const AdminDashboard = () => {
   const [adminData, setAdminData] = useState(null);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
+
+  const [popupData, setPopupData] = useState({
+    isOpen: false,
+    type: "success",
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
+
+  const showPopup = (type, title, message, onConfirm = null) => {
+    setPopupData({
+      isOpen: true,
+      type,
+      title,
+      message,
+      onConfirm,
+    });
+  };
 
   // Helper function to format image URLs
   const getImageUrl = (imageInput) => {
@@ -356,10 +375,7 @@ const AdminDashboard = () => {
     }
   };
 
-  const handleDeleteProperty = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this property?"))
-      return;
-
+  const executeDeleteProperty = async (id) => {
     try {
       const token = localStorage.getItem("accessToken");
       const res = await fetch(
@@ -374,15 +390,24 @@ const AdminDashboard = () => {
       const data = await res.json();
 
       if (data.success) {
-        alert("Property deleted successfully");
+        showPopup("success", "Deleted Successfully", "Property deleted successfully");
         fetchProperties(); // Refresh list
       } else {
-        alert("Error: " + data.message);
+        showPopup("error", "Error", "Error: " + data.message);
       }
     } catch (error) {
       console.error("Error deleting property:", error);
-      alert("Failed to delete property");
+      showPopup("error", "Failed", "Failed to delete property");
     }
+  };
+
+  const handleDeleteProperty = (id) => {
+    showPopup(
+      "warning",
+      "Confirm Delete",
+      "Are you sure you want to delete this property?",
+      () => executeDeleteProperty(id)
+    );
   };
 
   const handleToggleStatus = async (id, currentStatus) => {
@@ -406,11 +431,11 @@ const AdminDashboard = () => {
       if (data.success) {
         fetchProperties(); // Refresh list
       } else {
-        alert("Error: " + data.message);
+        showPopup("error", "Error", "Error: " + data.message);
       }
     } catch (error) {
       console.error("Error toggling status:", error);
-      alert("Failed to update status");
+      showPopup("error", "Failed", "Failed to update status");
     }
   };
 
@@ -501,6 +526,14 @@ const AdminDashboard = () => {
           )}
         </main>
       </div>
+      <Popup
+        isOpen={popupData.isOpen}
+        type={popupData.type}
+        title={popupData.title}
+        message={popupData.message}
+        onConfirm={popupData.onConfirm}
+        onClose={() => setPopupData({ ...popupData, isOpen: false })}
+      />
     </div>
   );
 };
