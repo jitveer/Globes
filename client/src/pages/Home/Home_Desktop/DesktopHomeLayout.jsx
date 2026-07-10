@@ -723,13 +723,13 @@ const DesktopHomeLayout = () => {
                     <div className="flex items-center gap-2">
                       <FaBed className="text-orange-600" />
                       <span className="md:font-medium text-xs md:text-sm">
-                        {property.beds || 0} Beds
+                        {property.beds || property.plans?.[0]?.beds || 0} Beds
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <FaBath className="text-orange-600" />
                       <span className="md:font-medium text-xs md:text-sm">
-                        {property.baths || 0} Baths
+                        {property.baths || property.plans?.[0]?.baths || 0} Baths
                       </span>
                     </div>
                     <div className="flex items-center gap-2">

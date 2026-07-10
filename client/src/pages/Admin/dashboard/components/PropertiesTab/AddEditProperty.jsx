@@ -1,14 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  FaPlus,
-  FaTimes,
-  FaSave,
-  FaArrowLeft,
-  FaCheck,
-  FaCode,
-  FaFilePdf,
-} from "react-icons/fa";
+import { FaPlus, FaTimes, FaSave, FaArrowLeft, FaCheck, FaCode, FaFilePdf } from "react-icons/fa";
 import Popup from "../../../../../components/Popup";
 
 const BANGALORE_AREAS = [

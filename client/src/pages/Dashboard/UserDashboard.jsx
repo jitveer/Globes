@@ -405,11 +405,10 @@ const UserDashboard = () => {
                   <button
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
-                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-300 ${
-                      activeTab === tab.id
+                    className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl font-semibold transition-all duration-300 ${activeTab === tab.id
                         ? "bg-gradient-to-r from-orange-600 to-orange-700 text-white shadow-lg"
                         : "text-gray-700 hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     <tab.icon />
                     <span>{tab.label}</span>
@@ -688,11 +687,10 @@ const UserDashboard = () => {
                         <button
                           key={tab}
                           onClick={() => setNotificationFilter(tab)}
-                          className={`flex-1 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${
-                            notificationFilter === tab
+                          className={`flex-1 sm:px-4 py-2 rounded-lg text-xs font-bold transition-all duration-300 ${notificationFilter === tab
                               ? "bg-orange-600 text-white shadow-md"
                               : "text-gray-500 hover:text-gray-700 hover:bg-white"
-                          }`}
+                            }`}
                         >
                           {tab.charAt(0).toUpperCase() + tab.slice(1)}
                         </button>
@@ -709,11 +707,11 @@ const UserDashboard = () => {
                         </p>
                       </div>
                     ) : notifications.filter((n) => {
-                        const unread = !n.readBy.includes(user?.id);
-                        if (notificationFilter === "unread") return unread;
-                        if (notificationFilter === "read") return !unread;
-                        return true;
-                      }).length === 0 ? (
+                      const unread = !n.readBy.includes(user?.id);
+                      if (notificationFilter === "unread") return unread;
+                      if (notificationFilter === "read") return !unread;
+                      return true;
+                    }).length === 0 ? (
                       <div className="text-center py-12 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
                         <FaBell className="text-5xl text-gray-200 mx-auto mb-4" />
                         <h3 className="text-lg font-bold text-gray-900 mb-2">
@@ -774,13 +772,12 @@ const UserDashboard = () => {
                       >
                         <div className="flex items-center gap-4">
                           <div
-                            className={`p-3 rounded-full ${
-                              activity.type === "inquiry"
+                            className={`p-3 rounded-full ${activity.type === "inquiry"
                                 ? "bg-orange-100"
                                 : activity.type === "view"
                                   ? "bg-blue-100"
                                   : "bg-green-100"
-                            }`}
+                              }`}
                           >
                             {activity.type === "inquiry" ? (
                               <FaBell className="text-orange-600" />
@@ -800,11 +797,10 @@ const UserDashboard = () => {
                           </div>
                         </div>
                         <span
-                          className={`px-3 py-1 rounded-full text-sm font-semibold ${
-                            activity.status === "Pending"
+                          className={`px-3 py-1 rounded-full text-sm font-semibold ${activity.status === "Pending"
                               ? "bg-yellow-100 text-yellow-700"
                               : "bg-green-100 text-green-700"
-                          }`}
+                            }`}
                         >
                           {activity.status}
                         </span>
@@ -928,9 +924,8 @@ const NotificationCard = ({ notif, isUnread, onMarkAsRead, timeAgo }) => {
       <div className="flex gap-4 items-start">
         <div className="shrink-0">
           <div
-            className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl relative overflow-hidden ${
-              notif.image ? "" : getBadgeColor()
-            }`}
+            className={`w-12 h-12 rounded-xl flex items-center justify-center text-xl relative overflow-hidden ${notif.image ? "" : getBadgeColor()
+              }`}
           >
             {notif.image ? (
               <img
@@ -950,11 +945,10 @@ const NotificationCard = ({ notif, isUnread, onMarkAsRead, timeAgo }) => {
         <div className="flex-1 min-w-0">
           <div className="flex justify-between items-start mb-1">
             <h4
-              className={`text-base transition-colors ${
-                isUnread
+              className={`text-base transition-colors ${isUnread
                   ? "font-bold text-gray-900"
                   : "font-semibold text-gray-700"
-              } group-hover:text-orange-600`}
+                } group-hover:text-orange-600`}
             >
               {notif.title}
             </h4>
