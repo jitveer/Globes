@@ -563,10 +563,11 @@ const AddEditProperty = () => {
 
   // Handle plans
   const addPlan = () => {
+    const uniqueId = `plan-${Date.now()}-${Math.random().toString(36).substr(2, 5)}`;
     setPlans([
       ...plans,
       {
-        id: "1bhk",
+        id: uniqueId,
         label: "1 BHK",
         price: "",
         pricePerSqft: "",

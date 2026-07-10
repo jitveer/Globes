@@ -955,11 +955,11 @@ const PropertyDetails = () => {
               {/* Secondary Sub-configs (Specific Options) */}
               {bhkGroups[selectedBhkGroup] && bhkGroups[selectedBhkGroup].length > 0 && (
                 <div className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2 max-w-full px-2">
-                  {bhkGroups[selectedBhkGroup].map((plan) => (
+                  {bhkGroups[selectedBhkGroup].map((plan, index) => (
                     <button
-                      key={plan.id}
+                      key={`${plan.id || "plan"}-${plan.label}-${plan.area_sqm}-${index}`}
                       onClick={() => setSelectedPlan(plan)}
-                      className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg border text-[10px] md:text-xs font-bold transition-all duration-300 ${selectedPlan?.id === plan.id
+                      className={`px-3 py-1.5 md:px-4 md:py-2 rounded-lg border text-[10px] md:text-xs font-bold transition-all duration-300 ${selectedPlan === plan
                         ? "bg-orange-50 border-orange-500 text-orange-600 shadow-sm"
                         : "bg-white border-gray-200 text-gray-500 hover:border-orange-300 hover:text-orange-600"
                         }`}
