@@ -41,6 +41,7 @@ import {
   FaCalendarAlt,
   FaClock,
   FaTimes,
+  FaRupeeSign,
 } from "react-icons/fa";
 import Popup from "../../components/Popup";
 import SEO from "../../components/SEO";
@@ -725,7 +726,7 @@ const PropertyDetails = () => {
             <div className="text-left md:text-right">
               <div className="flex items-baseline gap-2 justify-start md:justify-end">
                 <span className="text-xl md:text-xl font-extrabold text-gray-900 whitespace-nowrap">
-                  {isPriceAvailable ? `₹${selectedPlan.price}` : "For Price"}
+                  {property.priceRange || property.price ? `₹${property.priceRange || property.price}` : "Contact for Price"}
                 </span>
                 {isPriceAvailable && selectedPlan?.pricePerSqft && selectedPlan.pricePerSqft !== "N/A" && (
                   <span className="text-gray-400 text-[10px] md:text-xs font-medium border-l border-gray-300 pl-2">
@@ -908,7 +909,7 @@ const PropertyDetails = () => {
             <div className="text-left">
               <div className="flex items-baseline gap-2">
                 <span className="text-xl font-extrabold text-gray-900 whitespace-nowrap">
-                  {isPriceAvailable ? `₹${selectedPlan.price}` : "For Price"}
+                  {property.priceRange || property.price ? `₹${property.priceRange || property.price}` : "Contact for Price"}
                 </span>
                 {isPriceAvailable && selectedPlan?.pricePerSqft && selectedPlan.pricePerSqft !== "N/A" && (
                   <span className="text-gray-400 text-[10px] font-medium border-l border-gray-300 pl-2">
@@ -1008,7 +1009,7 @@ const PropertyDetails = () => {
               </div> */}
 
               {/* Key Features based on selected plan */}
-              <div className="grid grid-cols-3 gap-2 md:gap-8">
+              <div className={`grid ${isPriceAvailable ? "grid-cols-4" : "grid-cols-3"} gap-2 md:gap-8`}>
                 <div className="flex flex-col items-center text-center group">
                   <div className="flex items-center justify-center w-10 md:w-14 h-10 md:h-14 bg-orange-50 group-hover:bg-orange-100 rounded-xl md:rounded-2xl mb-2 md:mb-3 shadow-sm transition-colors duration-300">
                     <FaBed className="text-orange-600 text-base md:text-2xl" />
@@ -1042,6 +1043,19 @@ const PropertyDetails = () => {
                     Sq.Ft
                   </p>
                 </div>
+                {isPriceAvailable && (
+                  <div className="flex flex-col items-center text-center group border-l border-gray-100">
+                    <div className="flex items-center justify-center w-10 md:w-14 h-10 md:h-14 bg-orange-50 group-hover:bg-orange-100 rounded-xl md:rounded-2xl mb-2 md:mb-3 shadow-sm transition-colors duration-300">
+                      <FaRupeeSign className="text-orange-600 text-base md:text-2xl" />
+                    </div>
+                    <p className="text-sm md:text-xl font-extrabold text-gray-900 leading-none">
+                      ₹{selectedPlan?.price}
+                    </p>
+                    <p className="text-[9px] md:text-xs text-gray-500 font-bold uppercase tracking-wider mt-1">
+                      Price
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
