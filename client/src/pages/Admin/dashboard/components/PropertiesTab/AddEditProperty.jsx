@@ -542,8 +542,8 @@ const AddEditProperty = () => {
         showPopup("warning", "Invalid Format", "Please upload a PDF file only!");
         return;
       }
-      if (file.size > 10 * 1024 * 1024) {
-        showPopup("warning", "File Too Large", "File size too large! Please select a PDF under 10MB.");
+      if (file.size > 50 * 1024 * 1024) {
+        showPopup("warning", "File Too Large", "File size too large! Please select a PDF under 50MB.");
         return;
       }
 
@@ -1791,7 +1791,7 @@ const AddEditProperty = () => {
                       Upload Brochure (PDF Only)
                     </p>
                     <p className="text-sm text-gray-500">
-                      Max file size: 10MB. Only PDF format is supported.
+                      Max file size: 50MB. Only PDF format is supported.
                     </p>
                   </div>
                   <input
