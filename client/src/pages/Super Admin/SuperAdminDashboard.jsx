@@ -167,6 +167,7 @@ const SuperAdminDashboard = () => {
   // --- Administrators List State ---
   const [adminsList, setAdminsList] = useState([]); // Array to store admins fetched from DB
   const [listLoading, setListLoading] = useState(false); // Controls table loading spinner
+  const [backupLoading, setBackupLoading] = useState(false);
 
   // --- Popup State ---
   const [popupConfig, setPopupConfig] = useState({
@@ -582,6 +583,50 @@ const SuperAdminDashboard = () => {
     );
   };
 
+  const handleDownloadBackup = async () => {
+    setBackupLoading(true);
+    const token = localStorage.getItem("accessToken");
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/superadmin/backup`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to generate backup from server.");
+      }
+
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+
+      const contentDisposition = response.headers.get("content-disposition");
+      let filename = `globes_backup_${new Date().toISOString().split("T")[0]}.zip`;
+      if (contentDisposition) {
+        const match = contentDisposition.match(/filename=(.+)/);
+        if (match && match[1]) filename = match[1];
+      }
+
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+
+      showPopup("success", "Backup Downloaded", "The backup ZIP file has been downloaded successfully.");
+    } catch (err) {
+      console.error(err);
+      showPopup("error", "Backup Failed", err.message || "Failed to download backup.");
+    } finally {
+      setBackupLoading(false);
+    }
+  };
+
   const menuItems = [
     { id: "overview", label: "Platform Overview", icon: FaChartBar },
     { id: "admins", label: "Admin Management", icon: FaUserShield },
@@ -592,7 +637,9 @@ const SuperAdminDashboard = () => {
     { id: "system", label: "System Health", icon: FaServer },
     { id: "settings", label: "Platform Settings", icon: FaTools },
     { id: "ads", label: "Ads Control", icon: FaTools },
+    { id: "backup", label: "System Backup", icon: FaDownload },
   ];
+
 
   const handleLogout = () => {
     localStorage.removeItem("accessToken");
@@ -1358,7 +1405,79 @@ const SuperAdminDashboard = () => {
             </div>
           )}
 
-          {activeTab !== "overview" && activeTab !== "admins" && (
+          {activeTab === "backup" && (
+            <div className="space-y-8 animate-[fadeIn_0.5s_ease-out]">
+              <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
+                <div>
+                  <h2 className="text-3xl font-black text-slate-800 tracking-tight">
+                    System Backup
+                  </h2>
+                  <p className="text-slate-500 font-medium">
+                    Download complete snapshot of database and user media files
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 max-w-2xl">
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="bg-red-50 p-4 rounded-full text-red-600">
+                    <FaDownload className="text-3xl" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-slate-800">
+                      One-Click Complete Backup
+                    </h3>
+                    <p className="text-slate-500 text-sm">
+                      Securely packages your MongoDB database collections and uploaded files into a ZIP archive.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="border-t border-slate-100 py-6 space-y-4">
+                  <h4 className="font-bold text-slate-700 text-sm">Backup Contents:</h4>
+                  <ul className="space-y-2.5 text-sm text-slate-600">
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                      <span>Database Collections (Properties, Users, Inquiries, Blogs, Reviews, Settings, Otps, etc.) as structured JSON</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                      <span>Uploads Folder (Property brochures, brochures PDFs, uploaded property photos)</span>
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
+                      <span>Dynamic backup filename containing current timestamp</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div className="border-t border-slate-100 pt-6">
+                  <button
+                    onClick={handleDownloadBackup}
+                    disabled={backupLoading}
+                    className="flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-xl disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-lg shadow-red-600/10"
+                  >
+                    {backupLoading ? (
+                      <>
+                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        Generating Backup ZIP...
+                      </>
+                    ) : (
+                      <>
+                        <FaDownload />
+                        Generate & Download Backup
+                      </>
+                    )}
+                  </button>
+                  <p className="text-xs text-slate-400 mt-3">
+                    Note: Depending on the size of your uploads folder, backup generation might take up to a few minutes. Please do not close this window while downloading.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab !== "overview" && activeTab !== "admins" && activeTab !== "backup" && (
             <div className="flex flex-col items-center justify-center h-full py-20 text-center animate-[fadeIn_0.5s_ease-out]">
               <div className="bg-slate-200 p-6 rounded-full mb-6">
                 <FaTools className="text-4xl text-slate-400" />
@@ -1378,6 +1497,7 @@ const SuperAdminDashboard = () => {
               </button>
             </div>
           )}
+
         </main>
       </div>
 

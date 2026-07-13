@@ -34,4 +34,7 @@ router.patch(
   superAdminController.updateAdmin,
 );
 
+// Backup Routes
+router.get("/backup", superAdminController.downloadBackup);
+
 module.exports = router;

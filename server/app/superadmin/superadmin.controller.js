@@ -3,6 +3,7 @@ const Property = require("../properties/properties.model");
 const ApiResponse = require("../../shared/utils/ApiResponse.util");
 const asyncHandler = require("../../shared/utils/asyncHandler.util");
 const mongoose = require("mongoose");
+const { generateBackupStream } = require("../../shared/services/backup.service");
 
 // @desc    Get global platform stats
 // @route   GET /api/superadmin/stats
@@ -259,3 +260,16 @@ exports.updateAdmin = asyncHandler(async (req, res) => {
     .status(200)
     .json(new ApiResponse(200, updatedUser, "Admin updated successfully"));
 });
+
+// @desc    Download platform backup
+// @route   GET /api/superadmin/backup
+// @access  Private/SuperAdmin
+exports.downloadBackup = asyncHandler(async (req, res) => {
+  const dateStr = new Date().toISOString().replace(/T/, "_").replace(/\..+/, "").replace(/:/g, "-");
+  const filename = `globes_backup_${dateStr}.zip`;
+
+  res.setHeader("Content-Type", "application/zip");
+  res.setHeader("Content-Disposition", `attachment; filename=${filename}`);
+
+  await generateBackupStream(res);
+});
