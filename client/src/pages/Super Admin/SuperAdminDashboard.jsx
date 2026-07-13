@@ -599,7 +599,14 @@ const SuperAdminDashboard = () => {
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to generate ${type === "database" ? "database" : "media"} backup from server.`);
+        let errMsg = `Failed to generate ${type === "database" ? "database" : "media"} backup from server.`;
+        try {
+          const errData = await response.json();
+          if (errData && errData.message) {
+            errMsg = errData.message;
+          }
+        } catch (_) {}
+        throw new Error(errMsg);
       }
 
       const blob = await response.blob();
