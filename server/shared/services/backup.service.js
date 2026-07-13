@@ -24,7 +24,7 @@ require("../../app/otp/otp.model");
 const generateBackupStream = async (res) => {
   const { ZipArchive } = await import("archiver");
   const archive = new ZipArchive({
-    zlib: { level: 9 }, // Maximum compression level
+    zlib: { level: 1 }, // Fastest compression to prevent timeouts in production
   });
 
   // Handle archive errors
