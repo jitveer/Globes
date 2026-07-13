@@ -15,27 +15,22 @@ require("../../app/wishlist/wishlist.model");
 require("../../app/otp/otp.model");
 
 /**
- * Generates a ZIP backup containing:
- * - All Mongoose collections exported as formatted JSON
- * - All files in the uploads folder
+ * Generates a ZIP backup containing all Mongoose collections exported as formatted JSON
  * 
  * @param {Object} res - Express response object to stream the ZIP
  */
-const generateBackupStream = async (res) => {
+const generateDatabaseBackupStream = async (res) => {
   const { ZipArchive } = await import("archiver");
   const archive = new ZipArchive({
-    zlib: { level: 1 }, // Fastest compression to prevent timeouts in production
+    zlib: { level: 1 }, // Fastest compression to prevent timeouts
   });
 
-  // Handle archive errors
   archive.on("error", (err) => {
     throw err;
   });
 
-  // Pipe archive data directly to the Express response
   archive.pipe(res);
 
-  // 1. Export Database Collections
   const modelNames = mongoose.modelNames();
   for (const modelName of modelNames) {
     try {
@@ -48,7 +43,26 @@ const generateBackupStream = async (res) => {
     }
   }
 
-  // 2. Export local uploads folder
+  await archive.finalize();
+};
+
+/**
+ * Generates a ZIP backup containing files in the uploads folder
+ * 
+ * @param {Object} res - Express response object to stream the ZIP
+ */
+const generateMediaBackupStream = async (res) => {
+  const { ZipArchive } = await import("archiver");
+  const archive = new ZipArchive({
+    zlib: { level: 1 }, // Fastest compression to prevent timeouts
+  });
+
+  archive.on("error", (err) => {
+    throw err;
+  });
+
+  archive.pipe(res);
+
   const uploadsPath = path.join(__dirname, "../../uploads");
   if (fs.existsSync(uploadsPath)) {
     archive.directory(uploadsPath, "uploads");
@@ -56,10 +70,10 @@ const generateBackupStream = async (res) => {
     console.warn("Uploads directory not found at:", uploadsPath);
   }
 
-  // Finalize the archive (this completes the ZIP stream)
   await archive.finalize();
 };
 
 module.exports = {
-  generateBackupStream,
+  generateDatabaseBackupStream,
+  generateMediaBackupStream,
 };

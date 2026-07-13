@@ -167,7 +167,8 @@ const SuperAdminDashboard = () => {
   // --- Administrators List State ---
   const [adminsList, setAdminsList] = useState([]); // Array to store admins fetched from DB
   const [listLoading, setListLoading] = useState(false); // Controls table loading spinner
-  const [backupLoading, setBackupLoading] = useState(false);
+  const [dbBackupLoading, setDbBackupLoading] = useState(false);
+  const [mediaBackupLoading, setMediaBackupLoading] = useState(false);
 
   // --- Popup State ---
   const [popupConfig, setPopupConfig] = useState({
@@ -583,12 +584,13 @@ const SuperAdminDashboard = () => {
     );
   };
 
-  const handleDownloadBackup = async () => {
-    setBackupLoading(true);
+  const handleDownloadBackup = async (type) => {
+    const setLoading = type === "database" ? setDbBackupLoading : setMediaBackupLoading;
+    setLoading(true);
     const token = localStorage.getItem("accessToken");
     try {
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/v1/superadmin/backup`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/v1/superadmin/backup/${type}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -597,7 +599,7 @@ const SuperAdminDashboard = () => {
       );
 
       if (!response.ok) {
-        throw new Error("Failed to generate backup from server.");
+        throw new Error(`Failed to generate ${type === "database" ? "database" : "media"} backup from server.`);
       }
 
       const blob = await response.blob();
@@ -606,7 +608,7 @@ const SuperAdminDashboard = () => {
       a.href = url;
 
       const contentDisposition = response.headers.get("content-disposition");
-      let filename = `globes_backup_${new Date().toISOString().split("T")[0]}.zip`;
+      let filename = `globes_${type}_backup_${new Date().toISOString().split("T")[0]}.zip`;
       if (contentDisposition) {
         const match = contentDisposition.match(/filename=(.+)/);
         if (match && match[1]) filename = match[1];
@@ -618,12 +620,12 @@ const SuperAdminDashboard = () => {
       a.remove();
       window.URL.revokeObjectURL(url);
 
-      showPopup("success", "Backup Downloaded", "The backup ZIP file has been downloaded successfully.");
+      showPopup("success", "Backup Downloaded", `The ${type === "database" ? "database" : "media"} backup ZIP file has been downloaded successfully.`);
     } catch (err) {
       console.error(err);
-      showPopup("error", "Backup Failed", err.message || "Failed to download backup.");
+      showPopup("error", "Backup Failed", err.message || `Failed to download ${type} backup.`);
     } finally {
-      setBackupLoading(false);
+      setLoading(false);
     }
   };
 
@@ -1418,60 +1420,91 @@ const SuperAdminDashboard = () => {
                 </div>
               </div>
 
-              <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 max-w-2xl">
-                <div className="flex items-center gap-4 mb-6">
-                  <div className="bg-red-50 p-4 rounded-full text-red-600">
-                    <FaDownload className="text-3xl" />
-                  </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl">
+                {/* Database Backup Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 flex flex-col justify-between">
                   <div>
-                    <h3 className="text-xl font-bold text-slate-800">
-                      One-Click Complete Backup
-                    </h3>
-                    <p className="text-slate-500 text-sm">
-                      Securely packages your MongoDB database collections and uploaded files into a ZIP archive.
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="bg-emerald-50 p-4 rounded-full text-emerald-600">
+                        <FaServer className="text-3xl" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-slate-800">
+                          Database Backup
+                        </h3>
+                        <span className="inline-block bg-emerald-100 text-emerald-800 text-xs font-semibold px-2 py-0.5 rounded">
+                          Recommended & Instant
+                        </span>
+                      </div>
+                    </div>
+
+                    <p className="text-slate-500 text-sm mb-6">
+                      Downloads all structured collections (Users, Properties, Reviews, Settings, etc.) as JSON files inside a ZIP.
                     </p>
                   </div>
+
+                  <div className="border-t border-slate-100 pt-6">
+                    <button
+                      onClick={() => handleDownloadBackup("database")}
+                      disabled={dbBackupLoading || mediaBackupLoading}
+                      className="w-full flex items-center justify-center gap-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-4 rounded-xl disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-lg shadow-emerald-600/10"
+                    >
+                      {dbBackupLoading ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Exporting DB...
+                        </>
+                      ) : (
+                        <>
+                          <FaDownload />
+                          Download Database (Instant)
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
 
-                <div className="border-t border-slate-100 py-6 space-y-4">
-                  <h4 className="font-bold text-slate-700 text-sm">Backup Contents:</h4>
-                  <ul className="space-y-2.5 text-sm text-slate-600">
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                      <span>Database Collections (Properties, Users, Inquiries, Blogs, Reviews, Settings, Otps, etc.) as structured JSON</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                      <span>Uploads Folder (Property brochures, brochures PDFs, uploaded property photos)</span>
-                    </li>
-                    <li className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                      <span>Dynamic backup filename containing current timestamp</span>
-                    </li>
-                  </ul>
-                </div>
+                {/* Media Backup Card */}
+                <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 flex flex-col justify-between">
+                  <div>
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="bg-orange-50 p-4 rounded-full text-orange-600">
+                        <FaBuilding className="text-3xl" />
+                      </div>
+                      <div>
+                        <h3 className="text-xl font-bold text-slate-800">
+                          Media Uploads Backup
+                        </h3>
+                        <span className="inline-block bg-orange-100 text-orange-800 text-xs font-semibold px-2 py-0.5 rounded">
+                          May take a few minutes
+                        </span>
+                      </div>
+                    </div>
 
-                <div className="border-t border-slate-100 pt-6">
-                  <button
-                    onClick={handleDownloadBackup}
-                    disabled={backupLoading}
-                    className="flex items-center gap-3 bg-red-600 hover:bg-red-700 text-white font-bold px-8 py-4 rounded-xl disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-lg shadow-red-600/10"
-                  >
-                    {backupLoading ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Generating Backup ZIP...
-                      </>
-                    ) : (
-                      <>
-                        <FaDownload />
-                        Generate & Download Backup
-                      </>
-                    )}
-                  </button>
-                  <p className="text-xs text-slate-400 mt-3">
-                    Note: Depending on the size of your uploads folder, backup generation might take up to a few minutes. Please do not close this window while downloading.
-                  </p>
+                    <p className="text-slate-500 text-sm mb-6">
+                      Zips the entire uploads folder containing property images, brochures, and documents.
+                    </p>
+                  </div>
+
+                  <div className="border-t border-slate-100 pt-6">
+                    <button
+                      onClick={() => handleDownloadBackup("media")}
+                      disabled={dbBackupLoading || mediaBackupLoading}
+                      className="w-full flex items-center justify-center gap-3 bg-orange-600 hover:bg-orange-700 text-white font-bold px-6 py-4 rounded-xl disabled:bg-slate-300 disabled:cursor-not-allowed transition-all shadow-lg shadow-orange-600/10"
+                    >
+                      {mediaBackupLoading ? (
+                        <>
+                          <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                          Packaging Media...
+                        </>
+                      ) : (
+                        <>
+                          <FaDownload />
+                          Download Media Archive
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
