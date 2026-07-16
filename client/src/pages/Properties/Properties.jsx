@@ -130,7 +130,7 @@ const Properties = () => {
       location: "",
       minPrice: 0,
       maxPrice: 30000,
-      minArea: 300,
+      minArea: 0,
       maxArea: 5000,
       bedrooms: "all",
       bathrooms: "all",
@@ -423,7 +423,7 @@ const Properties = () => {
       location: "",
       minPrice: 0,
       maxPrice: 30000,
-      minArea: 300,
+      minArea: 0,
       maxArea: 5000,
       bedrooms: "all",
       bathrooms: "all",
@@ -439,8 +439,8 @@ const Properties = () => {
     { id: "land", icon: FaTree, label: "Land" },
   ];
 
-  const minAreaPercent = Math.max(0, Math.min(100, ((filters.minArea - 300) / 4700) * 100));
-  const maxAreaPercent = Math.max(0, Math.min(100, ((filters.maxArea - 300) / 4700) * 100));
+  const minAreaPercent = Math.max(0, Math.min(100, (filters.minArea / 5000) * 100));
+  const maxAreaPercent = Math.max(0, Math.min(100, (filters.maxArea / 5000) * 100));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50/20 to-gray-50 md:mt-20">
@@ -641,7 +641,7 @@ const Properties = () => {
                       <div className="relative">
                         <input
                           type="range"
-                          min="300"
+                          min="0"
                           max="5000"
                           step="100"
                           value={filters.minArea}
@@ -661,7 +661,7 @@ const Properties = () => {
                         />
                         <input
                           type="range"
-                          min="300"
+                          min="0"
                           max="5000"
                           step="100"
                           value={filters.maxArea}
@@ -1206,7 +1206,7 @@ const Properties = () => {
                   <div className="relative">
                     <input
                       type="range"
-                      min="300"
+                      min="0"
                       max="5000"
                       step="100"
                       value={filters.minArea}
@@ -1226,7 +1226,7 @@ const Properties = () => {
                     />
                     <input
                       type="range"
-                      min="300"
+                      min="0"
                       max="5000"
                       step="100"
                       value={filters.maxArea}
