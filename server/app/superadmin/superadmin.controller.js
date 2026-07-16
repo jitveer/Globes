@@ -3,9 +3,9 @@ const Property = require("../properties/properties.model");
 const ApiResponse = require("../../shared/utils/ApiResponse.util");
 const asyncHandler = require("../../shared/utils/asyncHandler.util");
 const mongoose = require("mongoose");
-const { 
-  generateDatabaseBackupStream, 
-  generateMediaBackupStream 
+const {
+  generateDatabaseBackupStream,
+  generateMediaBackupStream
 } = require("../../shared/services/backup.service");
 
 // @desc    Get global platform stats
