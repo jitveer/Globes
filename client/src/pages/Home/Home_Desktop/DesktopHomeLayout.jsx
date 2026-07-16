@@ -28,6 +28,7 @@ import {
   FaTimes,
   FaCalendarAlt,
   FaClock,
+  FaArrowLeft,
 } from "react-icons/fa";
 import { MdApartment } from "react-icons/md";
 import Footer from "../../../components/Footer";
@@ -119,6 +120,8 @@ const DesktopHomeLayout = () => {
   const [activeCategory, setActiveCategory] = useState("all");
   const [favorites, setFavorites] = useState([]);
   const [latestRealProperties, setLatestRealProperties] = useState([]);
+  const [allPropertiesList, setAllPropertiesList] = useState([]);
+  const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const [currentSlide, setCurrentSlide] = useState(0);
@@ -316,8 +319,11 @@ const DesktopHomeLayout = () => {
       );
       const data = await res.json();
       if (data.success) {
+        // Store all properties for mobile search suggestions/discover more
+        setAllPropertiesList(data.data);
+
         // Sort by newest first and take 6
-        const sorted = data.data
+        const sorted = [...data.data]
           .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
           .slice(0, 6);
 
@@ -371,7 +377,7 @@ const DesktopHomeLayout = () => {
   useEffect(() => {
     if (searchQuery.trim().length > 1) {
       const searchLower = searchQuery.toLowerCase();
-      const allSearchable = [...latestRealProperties];
+      const allSearchable = [...allPropertiesList];
       const matched = [];
       const seenLabels = new Set();
 
@@ -412,7 +418,7 @@ const DesktopHomeLayout = () => {
       setSuggestions([]);
       setShowSuggestions(false);
     }
-  }, [searchQuery, latestRealProperties]);
+  }, [searchQuery, allPropertiesList]);
 
   // Close suggestions when clicking outside
   useEffect(() => {
@@ -421,8 +427,181 @@ const DesktopHomeLayout = () => {
     return () => window.removeEventListener("click", handleClickOutside);
   }, []);
 
+  // Disable body scroll when mobile search is open
+  useEffect(() => {
+    if (isMobileSearchOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isMobileSearchOpen]);
+
+  // Mobile search input ref to auto focus
+  const mobileSearchInputRef = useRef(null);
+  useEffect(() => {
+    if (isMobileSearchOpen && mobileSearchInputRef.current) {
+      setTimeout(() => {
+        mobileSearchInputRef.current.focus();
+      }, 100);
+    }
+  }, [isMobileSearchOpen]);
+
+  // Get unique locations list dynamically
+  const getUniqueLocations = () => {
+    const defaultLocs = ["Thanisandra", "Hennur", "Hebbal", "Kogilu", "Rachenahalli", "Yelahanka", "Gummanahalli", "Devanahalli", "Horamavu", "Kanakapura", "Jakkur", "Sampigehalli", "Avalahalli", "Marathahalli", "Whitefield"];
+    const locs = new Set(defaultLocs);
+    allPropertiesList.forEach((p) => {
+      if (p.location) {
+        if (typeof p.location === "object") {
+          if (p.location.area) locs.add(p.location.area);
+          if (p.location.city) locs.add(p.location.city);
+        } else {
+          const parts = p.location.split(",");
+          parts.forEach((part) => {
+            const trimmed = part.trim();
+            if (
+              trimmed &&
+              trimmed.length > 2 &&
+              !trimmed.toLowerCase().includes("bangalore") &&
+              !trimmed.toLowerCase().includes("mumbai")
+            ) {
+              locs.add(trimmed);
+            }
+          });
+        }
+      }
+    });
+    return Array.from(locs).slice(0, 10);
+  };
+
   return (
     <div className="min-h-screen bg-white mt-1 md:mt-20">
+      {/* Mobile & Tablet Full-screen Search Overlay (Flipkart Style) */}
+      {isMobileSearchOpen && (
+        <div className="fixed inset-0 bg-gray-50 z-[99999] flex flex-col animate-[fadeIn_0.15s_ease-out] lg:hidden">
+          {/* Header */}
+          <div className="flex items-center gap-3 px-4 py-3 bg-white border-b border-gray-100 sticky top-0 shadow-sm">
+            <button
+              onClick={() => {
+                setIsMobileSearchOpen(false);
+                setSearchQuery("");
+              }}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-705"
+            >
+              <FaArrowLeft className="text-lg" />
+            </button>
+            <div className="flex-1 relative flex items-center">
+              <input
+                ref={mobileSearchInputRef}
+                type="text"
+                placeholder="Search for locations, properties..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleSearch();
+                    setIsMobileSearchOpen(false);
+                  }
+                }}
+                className="w-full bg-gray-50 pl-4 pr-10 py-2.5 rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all text-sm font-medium text-gray-800"
+              />
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery("")}
+                  className="absolute right-3 p-1 hover:bg-gray-200 rounded-full text-gray-400 hover:text-gray-605 transition-colors"
+                >
+                  <FaTimes className="text-sm" />
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Search Body Content */}
+          <div className="flex-1 overflow-y-auto p-4">
+            {/* Suggestions list when typing */}
+            {searchQuery.trim().length > 0 ? (
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden divide-y divide-gray-50">
+                {suggestions.length > 0 ? (
+                  suggestions.map((item, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        if (item.type === "property") {
+                          navigate(`/property/${item.id}`);
+                        } else {
+                          setSearchQuery(item.label);
+                          navigate(`/properties?search=${encodeURIComponent(item.label)}`);
+                        }
+                        setIsMobileSearchOpen(false);
+                      }}
+                      className="w-full px-4 py-3.5 flex items-center gap-4 active:bg-orange-50 transition-colors text-left"
+                    >
+                      <div
+                        className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.type === "property" ? "bg-orange-100 text-orange-600" : "bg-blue-100 text-blue-600"
+                          }`}
+                      >
+                        {item.type === "property" ? <FaHome className="text-lg" /> : <FaMapMarkerAlt className="text-lg" />}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-gray-800 text-sm">{item.label}</p>
+                        {item.sub && (
+                          <p className="text-xs text-gray-400 mt-0.5 flex items-center gap-1">
+                            <FaMapMarkerAlt className="text-[10px]" /> {item.sub}
+                          </p>
+                        )}
+                        <span className="inline-block text-[9px] bg-gray-100 text-gray-500 font-bold px-1.5 py-0.5 rounded uppercase tracking-wider mt-1">
+                          {item.type}
+                        </span>
+                      </div>
+                      <FaChevronRight className="text-gray-300 text-xs" />
+                    </button>
+                  ))
+                ) : (
+                  <div className="p-8 text-center text-gray-500">
+                    <FaSearch className="mx-auto text-3xl text-gray-300 mb-2" />
+                    <p className="text-sm font-medium">No matches found for "{searchQuery}"</p>
+                    <button
+                      onClick={() => {
+                        handleSearch();
+                        setIsMobileSearchOpen(false);
+                      }}
+                      className="mt-4 px-4 py-2 bg-orange-600 text-white rounded-lg text-xs font-semibold hover:bg-orange-700 transition-colors"
+                    >
+                      Search anyway
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Discover More / popular terms when empty query */
+              <div className="animate-[fadeIn_0.2s_ease-out]">
+                <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3.5 px-1">
+                  Discover More Locations
+                </h3>
+                <div className="flex flex-wrap gap-2.5">
+                  {getUniqueLocations().map((loc, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => {
+                        setSearchQuery(loc);
+                        navigate(`/properties?search=${encodeURIComponent(loc)}`);
+                        setIsMobileSearchOpen(false);
+                      }}
+                      className="px-4 py-2 bg-white active:bg-orange-50 border border-gray-200 rounded-full text-xs font-semibold text-gray-700 shadow-sm active:border-orange-300 active:text-orange-600 transition-all flex items-center gap-1.5"
+                    >
+                      <FaMapMarkerAlt className="text-orange-500 text-[10px]" />
+                      {loc}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
       {/* Hero Section with Slider */}
       <section className="relative h-[400px] md:h-[600px] lg:h-[700px] z-20">
         {/* Slides */}
@@ -462,10 +641,22 @@ const DesktopHomeLayout = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-                    onFocus={() =>
-                      searchQuery.length > 1 && setShowSuggestions(true)
-                    }
-                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base"
+                    onFocus={() => {
+                      if (window.innerWidth < 1024) {
+                        setIsMobileSearchOpen(true);
+                        document.activeElement?.blur();
+                      } else {
+                        if (searchQuery.length > 1) {
+                          setShowSuggestions(true);
+                        }
+                      }
+                    }}
+                    onClick={() => {
+                      if (window.innerWidth < 1024) {
+                        setIsMobileSearchOpen(true);
+                      }
+                    }}
+                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all duration-300 text-sm sm:text-base cursor-pointer lg:cursor-text"
                   />
 
                   {/* Suggestions Dropdown */}

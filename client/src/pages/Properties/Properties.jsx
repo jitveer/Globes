@@ -130,8 +130,8 @@ const Properties = () => {
       location: "",
       minPrice: 0,
       maxPrice: 30000,
-      minArea: 0,
-      maxArea: 10000,
+      minArea: 300,
+      maxArea: 5000,
       bedrooms: "all",
       bathrooms: "all",
       sortBy: "newest",
@@ -423,8 +423,8 @@ const Properties = () => {
       location: "",
       minPrice: 0,
       maxPrice: 30000,
-      minArea: 0,
-      maxArea: 10000,
+      minArea: 300,
+      maxArea: 5000,
       bedrooms: "all",
       bathrooms: "all",
       sortBy: "newest",
@@ -438,6 +438,9 @@ const Properties = () => {
     { id: "commercial", icon: FaWarehouse, label: "Commercial" },
     { id: "land", icon: FaTree, label: "Land" },
   ];
+
+  const minAreaPercent = Math.max(0, Math.min(100, ((filters.minArea - 300) / 4700) * 100));
+  const maxAreaPercent = Math.max(0, Math.min(100, ((filters.maxArea - 300) / 4700) * 100));
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-orange-50/20 to-gray-50 md:mt-20">
@@ -638,8 +641,8 @@ const Properties = () => {
                       <div className="relative">
                         <input
                           type="range"
-                          min="0"
-                          max="10000"
+                          min="300"
+                          max="5000"
                           step="100"
                           value={filters.minArea}
                           onChange={(e) =>
@@ -658,8 +661,8 @@ const Properties = () => {
                         />
                         <input
                           type="range"
-                          min="0"
-                          max="10000"
+                          min="300"
+                          max="5000"
                           step="100"
                           value={filters.maxArea}
                           onChange={(e) =>
@@ -673,11 +676,7 @@ const Properties = () => {
                           }
                           className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                           style={{
-                            background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${(filters.minArea / 10000) * 100
-                              }%, #ea580c ${(filters.minArea / 10000) * 100
-                              }%, #ea580c ${(filters.maxArea / 10000) * 100
-                              }%, #e5e7eb ${(filters.maxArea / 10000) * 100
-                              }%, #e5e7eb 100%)`,
+                            background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${minAreaPercent}%, #ea580c ${minAreaPercent}%, #ea580c ${maxAreaPercent}%, #e5e7eb ${maxAreaPercent}%, #e5e7eb 100%)`,
                           }}
                         />
                       </div>
@@ -1207,8 +1206,8 @@ const Properties = () => {
                   <div className="relative">
                     <input
                       type="range"
-                      min="0"
-                      max="10000"
+                      min="300"
+                      max="5000"
                       step="100"
                       value={filters.minArea}
                       onChange={(e) =>
@@ -1227,8 +1226,8 @@ const Properties = () => {
                     />
                     <input
                       type="range"
-                      min="0"
-                      max="10000"
+                      min="300"
+                      max="5000"
                       step="100"
                       value={filters.maxArea}
                       onChange={(e) =>
@@ -1242,11 +1241,7 @@ const Properties = () => {
                       }
                       className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                       style={{
-                        background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${(filters.minArea / 10000) * 100
-                          }%, #ea580c ${(filters.minArea / 10000) * 100
-                          }%, #ea580c ${(filters.maxArea / 10000) * 100
-                          }%, #e5e7eb ${(filters.maxArea / 10000) * 100
-                          }%, #e5e7eb 100%)`,
+                        background: `linear-gradient(to right, #e5e7eb 0%, #e5e7eb ${minAreaPercent}%, #ea580c ${minAreaPercent}%, #ea580c ${maxAreaPercent}%, #e5e7eb ${maxAreaPercent}%, #e5e7eb 100%)`,
                       }}
                     />
                   </div>

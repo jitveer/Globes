@@ -384,7 +384,7 @@ const Auth = () => {
                     {loading ? "Logging in..." : "Login"}
                   </button>
 
-                  <div className="relative my-6">
+                  {/* <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
                       <div className="w-full border-t border-gray-300"></div>
                     </div>
@@ -410,7 +410,7 @@ const Auth = () => {
                       <FaFacebook className="text-blue-600" />
                       Facebook
                     </button>
-                  </div>
+                  </div> */}
                 </form>
               ) : (
                 // Register Form
@@ -596,7 +596,7 @@ const Auth = () => {
                     {loading ? "Creating Account..." : "Create Account"}
                   </button>
 
-                  <div className="relative my-6">
+                  {/* <div className="relative my-6">
                     <div className="absolute inset-0 flex items-center">
                       <div className="w-full border-t border-gray-300"></div>
                     </div>
@@ -605,9 +605,9 @@ const Auth = () => {
                         Or register with
                       </span>
                     </div>
-                  </div>
+                  </div> */}
 
-                  <div className="grid grid-cols-2 gap-4">
+                  {/* <div className="grid grid-cols-2 gap-4">
                     <button
                       type="button"
                       className="flex items-center justify-center gap-2 px-4 py-3 border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:bg-gray-50 transition-all duration-300 hover:scale-105"
@@ -622,7 +622,7 @@ const Auth = () => {
                       <FaFacebook className="text-blue-600" />
                       Facebook
                     </button>
-                  </div>
+                  </div> */}
                 </form>
               )}
             </div>
